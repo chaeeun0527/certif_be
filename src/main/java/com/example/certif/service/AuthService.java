@@ -10,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -76,10 +75,10 @@ public class AuthService {
         String email = jwtUtil.getEmailFromToken(oldToken);
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-        return jwtUtil.generateToken(user);
+        return jwtUtil.generateAccessToken(user); // ✅ 수정됨
     }
 
     public String generateAccessToken(User user) {
-        return jwtUtil.generateToken(user);
+        return jwtUtil.generateAccessToken(user); // ✅ 수정됨
     }
 }
