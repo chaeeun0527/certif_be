@@ -1,4 +1,4 @@
-package com.example.certif.api;
+package com.example.certif.controller;
 
 import com.example.certif.dto.*;
 import com.example.certif.entity.User;
