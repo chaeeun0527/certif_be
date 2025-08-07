@@ -4,10 +4,10 @@ import com.example.certif.dto.LoginRequest;
 import com.example.certif.dto.SignupRequest;
 import com.example.certif.entity.User;
 import com.example.certif.service.AuthService;
+import com.example.certif.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -19,6 +19,7 @@ import java.util.Map;
 public class AuthController {
 
     private final AuthService authService;
+    private final JwtUtil jwtUtil;
 
     // 회원가입
     @PostMapping("/signup")
@@ -29,30 +30,31 @@ public class AuthController {
 
     // 로그인
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request) {
         User user = authService.login(request);
-        return ResponseEntity.ok(user);
+        String accessToken = jwtUtil.generateAccessToken(user);
+        String refreshToken = jwtUtil.generateRefreshToken(user);
+
+        return ResponseEntity.ok(Map.of(
+                "accessToken", accessToken,
+                "refreshToken", refreshToken
+        ));
     }
 
-    // 로그아웃
+    // 로그아웃 (토큰 블랙리스트 처리)
     @PostMapping("/logout")
-    public ResponseEntity<String> logout() {
-        // 실제 서비스에서는 JWT 토큰을 블랙리스트 처리하는 로직이 필요
+    public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
+        String pureToken = token.replace("Bearer ", "");
+        authService.logout(pureToken);
         return ResponseEntity.ok("로그아웃 성공");
     }
 
     // 토큰 갱신
     @PostMapping("/refresh-token")
-    public ResponseEntity<String> refreshToken() {
-        // JWT 토큰 갱신 로직 필요
-        return ResponseEntity.ok("토큰 갱신 성공");
-    }
-
-    // 회원 탈퇴
-    @DeleteMapping("/delete-account")
-    public ResponseEntity<String> deleteAccount(@RequestParam String email) {
-        authService.deleteAccount(email);
-        return ResponseEntity.ok("회원 탈퇴 완료");
+    public ResponseEntity<String> refreshToken(@RequestHeader("Authorization") String token) {
+        String pureToken = token.replace("Bearer ", "");
+        String newToken = authService.refreshToken(pureToken);
+        return ResponseEntity.ok(newToken);
     }
 
     // 이메일 중복 확인
@@ -67,5 +69,12 @@ public class AuthController {
     public ResponseEntity<Map<String, Boolean>> checkNickname(@RequestParam String nickname) {
         boolean isDuplicate = authService.checkNickname(nickname);
         return ResponseEntity.ok(Map.of("isDuplicate", isDuplicate));
+    }
+
+    // 회원 탈퇴
+    @DeleteMapping("/delete-account")
+    public ResponseEntity<String> deleteAccount(@RequestParam String email) {
+        authService.deleteAccount(email);
+        return ResponseEntity.ok("회원 탈퇴 완료");
     }
 }
