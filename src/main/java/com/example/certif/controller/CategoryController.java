@@ -1,5 +1,6 @@
 package com.example.certif.controller;
 
+import com.example.certif.dto.CategoryDto;
 import com.example.certif.entity.Category;
 import com.example.certif.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -25,15 +26,15 @@ public class CategoryController {
 
     // 1. 카테고리 목록 조회
     @GetMapping
-    public ResponseEntity<List<Category>> getAllCategories(){
-        List<Category> dtos = categoryService.getAllCategories();
+    public ResponseEntity<List<CategoryDto>> getAllCategories(){
+        List<CategoryDto> dtos = categoryService.getAllCategories();
         return ResponseEntity.status(HttpStatus.OK).body(dtos);
     }
 
     // 2. 특정 카테고리 조회
     @GetMapping("/{categoryId}")
-    public ResponseEntity<Category> getCategory(@PathVariable Long categoryId) {
-        Category dto = categoryService.getCategory(categoryId);
+    public ResponseEntity<CategoryDto> getCategory(@PathVariable Long categoryId) {
+        CategoryDto dto = categoryService.getCategory(categoryId);
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 }
