@@ -1,12 +1,10 @@
 package com.example.certif.controller;
 
 import com.example.certif.entity.Category;
-import com.example.certif.repository.CategoryRepository;
 import com.example.certif.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
