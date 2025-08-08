@@ -13,7 +13,8 @@ import java.util.List;
 public class CategoryService {
     @Autowired
     private CategoryRepository categoryRepository;
-    // 1. 카테고리 목록
+
+    // 1. 카테고리 목록 조회
     public List<Category> getAllCategories() {
         return categoryRepository.findAll();
     }

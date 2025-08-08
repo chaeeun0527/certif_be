@@ -5,6 +5,8 @@ import com.example.certif.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,15 +23,17 @@ public class CategoryController {
     private CategoryService categoryService;
 
 
-    // 1. 자격증 카테고리 목록 조회
+    // 1. 카테고리 목록 조회
     @GetMapping
-    public List<Category> getAllCategories(){
-        return categoryService.getAllCategories();
+    public ResponseEntity<List<Category>> getAllCategories(){
+        List<Category> dtos = categoryService.getAllCategories();
+        return ResponseEntity.status(HttpStatus.OK).body(dtos);
     }
 
-    // 2. 특정 자격증 카테고리 조회
+    // 2. 특정 카테고리 조회
     @GetMapping("/{categoryId}")
-    public Category getCategory(@PathVariable Long id) {
-        return categoryService.getCategory(id);
+    public ResponseEntity<Category> getCategory(@PathVariable Long categoryId) {
+        Category dto = categoryService.getCategory(categoryId);
+        return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 }
