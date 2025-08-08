@@ -37,4 +37,5 @@ public class CategoryController {
         CategoryDto dto = categoryService.getCategory(categoryId);
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
+
 }
