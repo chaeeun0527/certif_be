@@ -22,8 +22,8 @@ public class ScheduleDto {
     private Long phaseId;
     private String phaseName;
 
-    private Long typeId;
-    private String typeName;
+    private Long scheduleTypeId;
+    private String scheduleTypeName;
 
     private LocalDate stratDate;
     private LocalDate endDate;
