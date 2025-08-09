@@ -5,7 +5,6 @@ import com.example.certif.dto.ScheduleDto;
 import com.example.certif.entity.Schedule;
 import com.example.certif.repository.ScheduleRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,8 +15,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class ScheduleService {
-    @Autowired
-    private ScheduleRepository scheduleRepository;
+
+    private final ScheduleRepository scheduleRepository;
 
     // 1. 특정 자격증 일정 조회
     public List<ScheduleDto> getSchedules(Long certificateId) {

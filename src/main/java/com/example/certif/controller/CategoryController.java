@@ -5,7 +5,6 @@ import com.example.certif.entity.Category;
 import com.example.certif.service.CategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,9 +19,8 @@ import java.util.List;
 @RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
-    @Autowired
-    private CategoryService categoryService;
 
+    private final CategoryService categoryService;
 
     // 1. 카테고리 목록 조회
     @GetMapping

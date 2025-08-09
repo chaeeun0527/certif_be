@@ -5,7 +5,6 @@ import com.example.certif.dto.CertificateDto;
 import com.example.certif.service.CertificateService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +17,8 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 public class CertificateController {
-    @Autowired
-    private CertificateService certificateService;
+
+    private final CertificateService certificateService;
 
     // 1. 카테고리별 자격증 목록 조회
     @GetMapping("/api/categories/{categoryId}/certificates")

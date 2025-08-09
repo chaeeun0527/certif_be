@@ -5,7 +5,6 @@ import com.example.certif.dto.CertificateDto;
 import com.example.certif.entity.Certificate;
 import com.example.certif.repository.CertificateRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,8 +13,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class CertificateService {
-    @Autowired
-    private CertificateRepository certificateRepository;
+
+    private final CertificateRepository certificateRepository;
 
     // 1. 카테고리별 자격증 목록 조회
     public List<CertificateDto> getCertificates(Long categoryId) {
