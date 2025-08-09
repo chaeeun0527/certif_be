@@ -37,7 +37,7 @@ public class FavoriteService {
     // 2. 자격증을 즐겨찾기에 등록
     public void addFavorite(Long userId, Long certificateId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."))
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
         Certificate certificate = certificateRepository.findById(certificateId)
                 .orElseThrow(() -> new IllegalArgumentException("자격증을 찾을 수 없습니다."));
 
@@ -54,9 +54,9 @@ public class FavoriteService {
     // 3. 자격증을 즐겨찾기에서 해제
     public void removeFavorite(Long userId, Long certificateId) {
         favoriteRepository.deleteById(new FavoriteId(userId, certificateId));
-        }
     }
-
-
-
 }
+
+
+
+
