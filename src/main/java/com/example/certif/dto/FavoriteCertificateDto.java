@@ -12,4 +12,7 @@ import lombok.Setter;
 public class FavoriteCertificateDto {
     private Long certificateId;
     private String certificateName;
+    // 카테고리 추가
+    private Long categoryId;
+    private String categoryName;
 }
