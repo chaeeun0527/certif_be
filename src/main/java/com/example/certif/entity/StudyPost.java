@@ -1,6 +1,7 @@
 package com.example.certif.entity;
 
-import com.example.certif.dto.StudyPostDto;
+import com.example.certif.dto.StudyPostCreateDto;
+import com.example.certif.dto.StudyPostUpdateDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,7 +15,7 @@ import java.time.LocalDateTime;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
+@Builder
 public class StudyPost {
 
     @Id
@@ -47,7 +48,8 @@ public class StudyPost {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    public static StudyPost createStudyPost(StudyPostDto dto, User user, Category category) {
+    // 생성 전용 DTO 사용
+    public static StudyPost createStudyPost(StudyPostCreateDto dto, User user, Category category) {
         return StudyPost.builder()
                 .title(dto.getTitle())
                 .content(dto.getContent())
@@ -56,7 +58,8 @@ public class StudyPost {
                 .build();
     }
 
-    public void patch(StudyPostDto dto) {
+    // 수정 전용 DTO 사용
+    public void patch(StudyPostUpdateDto dto) {
         if (dto.getTitle() != null && !dto.getTitle().isEmpty()) {
             this.title = dto.getTitle();
         }

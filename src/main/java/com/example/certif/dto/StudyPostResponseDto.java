@@ -12,26 +12,22 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-
-public class StudyPostDto {
+public class StudyPostResponseDto {
     private Long postId;
     private String title;
     private String content;
     private String category;
     private LocalDateTime createdAt;
-    private Long user_id;
+    private Long userId;
 
-    public static StudyPostDto createStudyPostDto(StudyPost studyPost) {
-        StudyPostDto dto = new StudyPostDto();
+    public static StudyPostResponseDto fromEntity(StudyPost studyPost) {
+        StudyPostResponseDto dto = new StudyPostResponseDto();
         dto.setPostId(studyPost.getId());
         dto.setTitle(studyPost.getTitle());
         dto.setContent(studyPost.getContent());
         dto.setCategory(studyPost.getCategory().getName());
         dto.setCreatedAt(studyPost.getCreatedAt());
-        dto.setUser_id(studyPost.getUser().getId());
+        dto.setUserId(studyPost.getUser().getId());
         return dto;
     }
-
-
 }
-

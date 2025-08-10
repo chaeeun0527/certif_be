@@ -1,11 +1,10 @@
-package com.example.certif.service;
-
-import com.example.certif.dto.StudyPostDto;
+import com.example.certif.dto.StudyPostCreateDto;
+import com.example.certif.dto.StudyPostResponseDto;
+import com.example.certif.dto.StudyPostUpdateDto;
 import com.example.certif.entity.StudyPost;
 import com.example.certif.repository.StudyPostRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,92 +24,63 @@ public class StudyPostService {
     private UserRepository userRepository;
 
     // 1-1. 스터디 게시판 전체 글 조회 by 카테고리에서 기본 화면 (카테고리 번호=1)
-    public List<StudyPostDto> getDefaultCategoryPosts() {
-        // 1. 글조회
+    public List<StudyPostResponseDto> getDefaultCategoryPosts() {
         List<StudyPost> posts = studyPostRepository.findByCategoryIdOrderByCreatedAtDesc(1);
-        // 2. 엔티티 -> DTO 변환
-        List<StudyPostDto> dtos = new ArrayList<>();
-        for (int i = 0; i < posts.size(); i++) {
-            StudyPost p = posts.get(i);
-            StudyPostDto dto = StudyPostDto.createStudyPostDto(p);
-            dtos.add(dto);
+        List<StudyPostResponseDto> dtos = new ArrayList<>();
+        for (StudyPost p : posts) {
+            dtos.add(StudyPostResponseDto.fromEntity(p));
         }
-        // 3. 결과 반환
         return dtos;
     }
-
 
     // 1-2. 스터디 게시판 전체 글 조회 by 카테고리
-    public List<StudyPostDto> getPostsByCategory(Long categoryId) {
-        // 1. 글조회
+    public List<StudyPostResponseDto> getPostsByCategory(Long categoryId) {
         List<StudyPost> posts = studyPostRepository.findByCategoryIdOrderByCreatedAtDesc(categoryId);
-        // 2. 엔티티 -> DTO 변환
-        List<StudyPostDto> dtos = new ArrayList<>();
-        for (int i = 0; i < posts.size(); i++) {
-            StudyPost p = posts.get(i);
-            StudyPostDto dto = StudyPostDto.createStudyPostDto(p);
-            dtos.add(dto);
+        List<StudyPostResponseDto> dtos = new ArrayList<>();
+        for (StudyPost p : posts) {
+            dtos.add(StudyPostResponseDto.fromEntity(p));
         }
-        // 3. 결과 반환
         return dtos;
     }
 
-
     // 1-3. 특정 스터디 게시판 글 조회
-    public StudyPostDto findById(Long postId) {
+    public StudyPostResponseDto findById(Long postId) {
         StudyPost post = studyPostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 게시글이 존재하지 않습니다. postId=" + postId));
-        return StudyPostDto.createStudyPostDto(post);
+        return StudyPostResponseDto.fromEntity(post);
     }
-   
 
     // 2. 스터디 게시판 글 생성
     @Transactional
-    public StudyPostDto create(StudyPostDto dto, User user) {
-        // 1. 카테고리 조회
+    public StudyPostResponseDto create(StudyPostCreateDto dto, User user) {
         Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 카테고리"));
-        // 2. 게시판 글 엔티티 생성
         StudyPost studypost = StudyPost.createStudyPost(dto, user, category);
-        // 3. 저장
         StudyPost created = studyPostRepository.save(studypost);
-        // 4. 반환
-        return StudyPostDto.createStudyPostDto(created);
+        return StudyPostResponseDto.fromEntity(created);
     }
-
 
     // 3. 스터디 게시판 글 수정
     @Transactional
-    public StudyPostDto update(Long postId, StudyPostDto dto, User user) {
-        // 1. 게시판 글 조회 및 예외 발생
+    public StudyPostResponseDto update(Long postId, StudyPostUpdateDto dto, User user) {
         StudyPost target = studyPostRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("스터디 게시판 글 수정 실패!" + "대상 게시판 글이 없습니다."));
-        // 2. 권한 체크 - 로그인한 사용자와 게시글 작성자가 같은지 확인
+                .orElseThrow(() -> new IllegalArgumentException("스터디 게시판 글 수정 실패! 대상 게시판 글이 없습니다."));
         if (!target.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("수정 권한이 없습니다.");
         }
-        // 3. 게시판 글 수정
         target.patch(dto);
-        // 4. DB로 갱신
         StudyPost updated = studyPostRepository.save(target);
-        // 5. 게시판 글 엔티티를 DTO로 변환 및 반환
-        return StudyPostDto.createStudyPostDto(updated);
+        return StudyPostResponseDto.fromEntity(updated);
     }
-
 
     // 4. 스터디 게시판 글 삭제
     @Transactional
-    public void delete(Long postId) {
-        // 1. 게시판 글 조회 및 예외 발생
+    public void delete(Long postId, User user) {
         StudyPost target = studyPostRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시판 글 삭제 실패! " +
-                        "대상이 없습니다."));
-        // 2. 삭제 권한 확인
+                .orElseThrow(() -> new IllegalArgumentException("게시판 글 삭제 실패! 대상이 없습니다."));
         if (!target.getUser().getId().equals(user.getId())) {
             throw new AccessDeniedException("삭제 권한이 없습니다.");
         }
-        // 3. 게시판 글 삭제
         studyPostRepository.delete(target);
     }
-
 }
