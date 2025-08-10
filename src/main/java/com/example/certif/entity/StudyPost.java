@@ -1,7 +1,6 @@
 package com.example.certif.entity;
 
 import com.example.certif.dto.StudyPostDto;
-import com.example.certif.dto.StudyPostUpdateDto;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,13 +19,14 @@ public class StudyPost {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
     private Long id;
 
-    @Column(length = 200, nullable = false)
+    @Column(name="title", length = 200, nullable = false)
     private String title;
 
     @Lob
-    @Column(nullable = false)
+    @Column(name="content", nullable = false)
     private String content;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -56,7 +56,7 @@ public class StudyPost {
                 .build();
     }
 
-    public void patch(StudyPostUpdateDto dto) {
+    public void patch(StudyPostDto dto) {
         if (dto.getTitle() != null && !dto.getTitle().isEmpty()) {
             this.title = dto.getTitle();
         }
