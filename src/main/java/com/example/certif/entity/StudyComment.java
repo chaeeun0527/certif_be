@@ -59,7 +59,7 @@ public class StudyComment {
 
     public void patch(StudyCommentDto dto) {
         // 예외 발생
-        if(this.id != dto.getId())
+        if(this.id != dto.getPostId())
             throw new IllegalArgumentException("댓글 수정 실패! 잘못된 id가 입력됐습니다.");
         // 객체의 갱신 - 댓글 본문 내용 갱신
         if(dto.getContent() != null)

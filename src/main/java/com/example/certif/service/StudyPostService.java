@@ -1,14 +1,20 @@
+package com.example.certif.service;
+
 import com.example.certif.dto.StudyPostCreateDto;
 import com.example.certif.dto.StudyPostResponseDto;
 import com.example.certif.dto.StudyPostUpdateDto;
+import com.example.certif.entity.Category;
 import com.example.certif.entity.StudyPost;
+import com.example.certif.repository.CategoryRepository;
 import com.example.certif.repository.StudyPostRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.security.access.AccessDeniedException;
 
-import java.nio.file.AccessDeniedException;
+
+
 import java.util.ArrayList;
 import java.util.List;
 
