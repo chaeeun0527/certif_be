@@ -8,6 +8,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table(name = "share_post")
 @Getter
@@ -28,31 +30,45 @@ public class SharePostEntity {
     @Lob
     private String content;
 
+    // 사용자 ID
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
+
+    // 카테고리 ID
+    @Column(name = "category_id", nullable = false)
+    private Long categoryId;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
     private LocalDateTime createdAt;
+
     @Column
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    //외래키
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id")
-    private Category category;
 
-//    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<ShareComment> comments = new ArrayList<>();
+    @OneToMany(mappedBy = "sharePost", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ShareCommentEntity> comments = new ArrayList<>();
 
-    public void patch(SharePostEntity spe){
-        if(spe.title != null){
-            this.title = spe.title;
+    @Builder
+    public SharePostEntity(String title, String content, Long userId, Long categoryId){
+        this.title = title;
+        this.content = content;
+        this.userId = userId;
+        this.categoryId = categoryId;
+    }
+
+    // 게시물 수정 메서드
+    public void update(String title, String content, Long categoryId){
+        if(title != null && !title.isEmpty()){
+            this.title = title;
         }
-        if(spe.content != null ){
-            this.content = spe.content;
+        if(content != null && !content.isEmpty()){
+            this.content = content;
+        }
+        if(categoryId != null){
+            this.categoryId = categoryId;
         }
     }
 

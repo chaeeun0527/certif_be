@@ -1,27 +1,43 @@
 package com.example.certif.dto;
 
+//게시물 응답 DTO
 
-import lombok.AllArgsConstructor;
+import com.example.certif.entity.SharePostEntity;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.apache.catalina.LifecycleState;
+import org.springframework.jca.support.LocalConnectionFactoryBean;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
-@Setter
 @Getter
-@AllArgsConstructor
+@Setter
 @NoArgsConstructor
 public class SharePostResponseDto {
-
     private Long id;
     private String title;
     private String content;
     private Long userId;
+    private Long categoryId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<ShareCommentResponseDto> commnets;
 
+    // Entity -> DTO 변환
+    public SharePostResponseDto(SharePostEntity entity){
+        this.id = entity.getId();
+        this.title = entity.getTitle();
+        this.content = entity.getContent();
+        this.userId = entity.getUserId();
+        this.categoryId = entity.getCategoryId();
+        this.createdAt = entity.getCreatedAt();
+        this.updatedAt = entity.getUpdatedAt();
+        this.commnets = entity.getComments().stream()
+                .map(ShareCommentResponseDto::new)
+                .collect(Collectors.toList());
 
-
-
+    }
 }
