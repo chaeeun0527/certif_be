@@ -23,14 +23,14 @@ public class StudyCommentService {
 
 
     // 1. 스터디 게시판 글의 댓글 조회하기
-    public List<StudyCommentResponseDto> comments(Long postId) {
+    public List<StudyCommentDto> comments(Long postId) {
         // 1. 댓글 조회
         List<StudyComment> comments = studyCommentRepository.findByPostIdOrderByCreatedAtAsc(postId);
         // 2. 엔티티 -> dto 변환
-        List<StudyCommentResponseDto> dtos = new ArrayList<StudyCommentResponseDto>();
+        List<StudyCommentDto> dtos = new ArrayList<StudyCommentDto>();
         for (int i = 0; i < comments.size(); i++) {
             StudyComment c = comments.get(i);
-            StudyCommentResponseDto dto = StudyCommentResponseDto.createStudyCommentDto(c);
+            StudyCommentDto dto = StudyCommentDto.createStudyCommentDto(c);
             dtos.add(dto);
         }
         // 3. 결과 반환
