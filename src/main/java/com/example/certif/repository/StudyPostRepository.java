@@ -12,5 +12,5 @@ public interface StudyPostRepository extends JpaRepository<StudyPost, Long> {
     List<StudyPost> findByCategoryIdOrderByCreatedAtDesc(Long categoryId);
 
     // 게시글 ID로 조회
-    Optional<StudyPost> findByPostId(Long postId);
+    Optional<StudyPost> findById(Long id);
 }
