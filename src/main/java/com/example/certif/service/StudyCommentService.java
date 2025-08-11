@@ -3,8 +3,10 @@ package com.example.certif.service;
 import com.example.certif.dto.StudyCommentDto;
 import com.example.certif.entity.StudyComment;
 import com.example.certif.entity.StudyPost;
+import com.example.certif.entity.User;
 import com.example.certif.repository.StudyCommentRepository;
 import com.example.certif.repository.StudyPostRepository;
+import com.example.certif.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -40,11 +42,13 @@ public class StudyCommentService {
 
     // 2. 스터디 게시판 글의 댓글 생성하기
     @Transactional
-    public StudyCommentDto create(Long postId, StudyCommentDto dto, User user) {
-        // 1. 게시글 조회 및 예외 발생
+    public StudyCommentDto create(Long postId, StudyCommentDto dto, Long userId) {
+        // 1. 게시글&유저 조회 및 예외 발생
         StudyPost studyPost = studyPostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글 생성 실패! " +
                         "대상 게시글이 존재하지 않습니다."));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
         // 2. 댓글 엔티티 생성
         StudyComment studyComment = StudyComment.createComment(dto, studyPost, user);
         // 3. 댓글 엔티티를 db에 저장
@@ -56,13 +60,13 @@ public class StudyCommentService {
 
     // 3. 스터디 게시판 글의 댓글 수정하기
     @Transactional
-    public StudyCommentDto update(Long commentId, StudyCommentDto dto, User user) {
+    public StudyCommentDto update(Long commentId, StudyCommentDto dto, Long userId) {
         // 1. 댓글 조회 및 예외 발생
         StudyComment target = studyCommentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글 수정 실패!" +
                         "대상 댓글이 없습니다."));
         // 2. 권한 체크
-        if (!target.getUser().getId().equals(user.getId())) {
+        if (!target.getUser().getId().equals(userId)) {
             throw new SecurityException("댓글 수정 권한이 없습니다.");
         }
         // 3. 댓글 수정
@@ -76,19 +80,15 @@ public class StudyCommentService {
 
     // 4. 스터디 게시판 글의 댓글 삭제하기
     @Transactional
-    public void delete(Long commentId, User user) {
+    public void delete(Long commentId, Long userId) {
         // 1. 댓글 조회 및 예외 발생
         StudyComment target = studyCommentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글 삭제 실패! 대상 댓글이 없습니다."));
         // 2. 권한 확인: 댓글 작성자와 요청한 사용자가 일치하는지 확인
-        if (!target.getUser().getId().equals(user.getId())) {
+        if (!target.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("댓글 삭제 실패! 권한이 없습니다.");
         }
         // 3. 댓글 삭제
         studyCommentRepository.delete(target);
     }
-
-
-
-
 }

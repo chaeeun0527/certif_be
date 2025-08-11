@@ -1,12 +1,15 @@
 package com.example.certif.controller;
 
 import com.example.certif.dto.StudyCommentDto;
+import com.example.certif.entity.User;
 import com.example.certif.service.StudyCommentService;
 import com.example.certif.service.StudyPostService;
+import com.example.certif.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +18,9 @@ import java.util.List;
 @RequiredArgsConstructor
 
 public class StudyCommentController {
+
+    private final JwtUtil jwtUtil;
+
     @Autowired
     private StudyCommentService studyCommentService;
 
@@ -35,9 +41,11 @@ public class StudyCommentController {
     @PostMapping("/api/study/{postId}/comments")
     public ResponseEntity<StudyCommentDto> create(@PathVariable Long postId,
                                                   @RequestBody StudyCommentDto dto,
-                                                  @AuthenticationPrincipal User user){
+                                                  @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
         // 서비스에 위임
-        StudyCommentDto createdDto = studyCommentService.create(postId, dto, user);
+        StudyCommentDto createdDto = studyCommentService.create(postId, dto, userId);
         // 결과 응답
         return ResponseEntity.status(HttpStatus.OK).body(createdDto);
     }
@@ -47,9 +55,11 @@ public class StudyCommentController {
     @PatchMapping("/api/comments/{commentId}")
     public ResponseEntity<StudyCommentDto> update(@PathVariable Long commentId,
                                                   @RequestBody StudyCommentDto dto,
-                                                  @AuthenticationPrincipal User user) {
+                                                  @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
         // 서비스에 위임
-        StudyCommentDto updatedDto = studyCommentService.update(commentId, dto, user);
+        StudyCommentDto updatedDto = studyCommentService.update(commentId, dto, userId);
         // 결과 응답
         return ResponseEntity.status(HttpStatus.OK).body(updatedDto);
 
@@ -58,9 +68,11 @@ public class StudyCommentController {
     // 4. 댓글 삭제
     @DeleteMapping("/api/comments/{commentId}")
     public ResponseEntity<Void> delete(@PathVariable Long commentId,
-                                       @AuthenticationPrincipal User user) {
+                                       @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
         // 서비스에 위임
-        studyCommentService.delete(commentId, user);
+        studyCommentService.delete(commentId, userId);
         // 결과 응답
         return ResponseEntity.noContent().build();
     }

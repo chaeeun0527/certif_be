@@ -5,8 +5,10 @@ import com.example.certif.dto.StudyPostResponseDto;
 import com.example.certif.dto.StudyPostUpdateDto;
 import com.example.certif.entity.Category;
 import com.example.certif.entity.StudyPost;
+import com.example.certif.entity.User;
 import com.example.certif.repository.CategoryRepository;
 import com.example.certif.repository.StudyPostRepository;
+import com.example.certif.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,22 +60,29 @@ public class StudyPostService {
 
     // 2. 스터디 게시판 글 생성
     @Transactional
-    public StudyPostResponseDto create(StudyPostCreateDto dto, User user) {
+    public StudyPostResponseDto create(StudyPostCreateDto dto, Long userId) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. userId=" + userId));
         Category category = categoryRepository.findById(dto.getCategoryId())
                 .orElseThrow(() -> new RuntimeException("존재하지 않는 카테고리"));
+
         StudyPost studypost = StudyPost.createStudyPost(dto, user, category);
         StudyPost created = studyPostRepository.save(studypost);
+
         return StudyPostResponseDto.fromEntity(created);
     }
 
     // 3. 스터디 게시판 글 수정
     @Transactional
-    public StudyPostResponseDto update(Long postId, StudyPostUpdateDto dto, User user) {
+    public StudyPostResponseDto update(Long postId, StudyPostUpdateDto dto, Long userId) {
+
         StudyPost target = studyPostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("스터디 게시판 글 수정 실패! 대상 게시판 글이 없습니다."));
-        if (!target.getUser().getId().equals(user.getId())) {
+        if (!target.getUser().getId().equals(userId) {
             throw new AccessDeniedException("수정 권한이 없습니다.");
         }
+
         target.patch(dto);
         StudyPost updated = studyPostRepository.save(target);
         return StudyPostResponseDto.fromEntity(updated);
@@ -81,12 +90,15 @@ public class StudyPostService {
 
     // 4. 스터디 게시판 글 삭제
     @Transactional
-    public void delete(Long postId, User user) {
+    public void delete(Long postId, Long userId) {
+
         StudyPost target = studyPostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시판 글 삭제 실패! 대상이 없습니다."));
-        if (!target.getUser().getId().equals(user.getId())) {
+
+        if (!target.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("삭제 권한이 없습니다.");
         }
+
         studyPostRepository.delete(target);
     }
 }
