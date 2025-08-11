@@ -20,7 +20,7 @@ public class JwtUtil {
     public String generateAccessToken(com.example.certif.entity.User user) {
         return Jwts.builder()
                 .setSubject(user.getEmail())
-                .claim("userId", user.getId()) // 수정
+                .claim("userId", user.getId())
                 .claim("nickname", user.getNickname())
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXPIRATION))
@@ -48,6 +48,7 @@ public class JwtUtil {
         }
     }
 
+
     // ✅ 토큰에서 userId 추출: 수정 파트
     public Long getUserIdFromToken(String token) {
         return Jwts.parserBuilder()
@@ -57,6 +58,7 @@ public class JwtUtil {
                 .getBody()
                 .get("userId", Long.class);
     }
+
 
     // ✅ 토큰에서 이메일 추출
     public String getEmailFromToken(String token) {
