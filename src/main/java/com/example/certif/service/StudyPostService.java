@@ -33,7 +33,7 @@ public class StudyPostService {
 
     // 1-1. 스터디 게시판 전체 글 조회 by 카테고리에서 기본 화면 (카테고리 번호=1)
     public List<StudyPostResponseDto> getDefaultCategoryPosts() {
-        List<StudyPost> posts = studyPostRepository.findByCategoryIdOrderByCreatedAtDesc(1);
+        List<StudyPost> posts = studyPostRepository.findByCategoryIdOrderByCreatedAtDesc(1L);
         List<StudyPostResponseDto> dtos = new ArrayList<>();
         for (StudyPost p : posts) {
             dtos.add(StudyPostResponseDto.fromEntity(p));
@@ -79,7 +79,7 @@ public class StudyPostService {
 
         StudyPost target = studyPostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("스터디 게시판 글 수정 실패! 대상 게시판 글이 없습니다."));
-        if (!target.getUser().getId().equals(userId) {
+        if (!target.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("수정 권한이 없습니다.");
         }
 

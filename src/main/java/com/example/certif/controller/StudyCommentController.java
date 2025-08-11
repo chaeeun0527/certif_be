@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +28,7 @@ public class StudyCommentController {
 
     // 1. 스터디 게시판 글의 댓글 조회
     @GetMapping("api/study/{postId}/comments")
-    public ResponseEntity<List<StudyCommentDto> getComments(@PathVariable Long postId) {
+    public ResponseEntity<List<StudyCommentDto>> getComments(@PathVariable Long postId) {
         // 서비스에 위임
         List<StudyCommentDto> dtos = studyCommentService.comments(postId);
         // 결과 응답

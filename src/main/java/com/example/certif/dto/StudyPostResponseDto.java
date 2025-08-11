@@ -18,6 +18,7 @@ public class StudyPostResponseDto {
     private String content;
     private String category;
     private LocalDateTime createdAt;
+    private String nickname;
     private Long userId;
 
     public static StudyPostResponseDto fromEntity(StudyPost studyPost) {
@@ -27,6 +28,7 @@ public class StudyPostResponseDto {
         dto.setContent(studyPost.getContent());
         dto.setCategory(studyPost.getCategory().getName());
         dto.setCreatedAt(studyPost.getCreatedAt());
+        dto.setNickname(studyPost.getUser().getNickname());
         dto.setUserId(studyPost.getUser().getId());
         return dto;
     }
