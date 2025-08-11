@@ -23,13 +23,13 @@ public class SharePostCreateRequestDto {
     @NotNull (message = "카테고리 ID는 필수 입력 값입니다.")
     private Long categoryId;
 
-    // DTO -> Entity 변환 메서드 (userId는 서비스에서 받아와야 함)
+    // DTO -> Entity 변환 메서드
     public SharePostEntity toEntity(Long userId) {
         return SharePostEntity.builder()
                 .title(this.title)
                 .content(this.content)
-                .userId(userId)
-                .categoryId(this.categoryId)
+                .user(user)
+                .category(category)
                 .build();
     }
 }

@@ -30,13 +30,15 @@ public class SharePostEntity {
     @Lob
     private String content;
 
-    // 사용자 ID
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    // 사용자 ID -> 외래키
+    @ManyToOne(fetch =  FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    // 카테고리 ID
-    @Column(name = "category_id", nullable = false)
-    private Long categoryId;
+    // 카테고리 ID -> 외래키
+    @ManyToOne(fetch =  FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    private Category category;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     @CreationTimestamp
@@ -55,8 +57,8 @@ public class SharePostEntity {
     public SharePostEntity(String title, String content, Long userId, Long categoryId){
         this.title = title;
         this.content = content;
-        this.userId = userId;
-        this.categoryId = categoryId;
+        this.user = user;
+        this.category = category;
     }
 
     // 게시물 수정 메서드
@@ -68,7 +70,7 @@ public class SharePostEntity {
             this.content = content;
         }
         if(categoryId != null){
-            this.categoryId = categoryId;
+            this.category = category;
         }
     }
 

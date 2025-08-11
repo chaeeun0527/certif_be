@@ -1,10 +1,8 @@
-package com.example.certif.api;
+package com.example.certif.controller;
 
 import com.example.certif.dto.*;
-import com.example.certif.entity.SharePostEntity;
 import com.example.certif.service.ShareService;
 import jakarta.validation.Valid;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
