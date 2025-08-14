@@ -13,7 +13,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class ShareCommentCreateRequestDto {
-    @NotBlank(message = "내용을 입력해 주세요.")
+    @NotBlank(message = "내용은 필수 입력값 입니다.")
     private String content;
 
     //DTO -> Entity 변환
