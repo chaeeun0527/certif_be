@@ -1,9 +1,7 @@
 package com.example.certif.entity;
 
 import jakarta.persistence.*;
-import jdk.jfr.Category;
 import lombok.*;
-import org.apache.catalina.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -54,7 +52,7 @@ public class SharePostEntity {
     private List<ShareCommentEntity> comments = new ArrayList<>();
 
     @Builder
-    public SharePostEntity(String title, String content, Long userId, Long categoryId){
+    public SharePostEntity(String title, String content, com.example.certif.entity.User user, com.example.certif.entity.Category category){
         this.title = title;
         this.content = content;
         this.user = user;
