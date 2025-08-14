@@ -2,7 +2,9 @@ package com.example.certif.dto;
 
 //게시물 생성 요청 DTO
 
+import com.example.certif.entity.Category;
 import com.example.certif.entity.SharePostEntity;
+import com.example.certif.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -24,7 +26,7 @@ public class SharePostCreateRequestDto {
     private Long categoryId;
 
     // DTO -> Entity 변환 메서드
-    public SharePostEntity toEntity(Long userId) {
+    public SharePostEntity toEntity(User user, Category category) {
         return SharePostEntity.builder()
                 .title(this.title)
                 .content(this.content)

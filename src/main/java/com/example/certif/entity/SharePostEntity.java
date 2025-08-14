@@ -48,6 +48,7 @@ public class SharePostEntity {
 
 
 
+    @Builder.Default
     @OneToMany(mappedBy = "sharePost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShareCommentEntity> comments = new ArrayList<>();
 
@@ -60,14 +61,14 @@ public class SharePostEntity {
     }
 
     // 게시물 수정 메서드
-    public void update(String title, String content, Long categoryId){
+    public void update(String title, String content, Category category){
         if(title != null && !title.isEmpty()){
             this.title = title;
         }
         if(content != null && !content.isEmpty()){
             this.content = content;
         }
-        if(categoryId != null){
+        if(category != null){
             this.category = category;
         }
     }
