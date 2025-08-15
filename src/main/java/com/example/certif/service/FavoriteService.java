@@ -44,7 +44,7 @@ public class FavoriteService {
 
         FavoriteId id = new FavoriteId(userId, certificateId);
         // 이미 등록된 즐겨찾기인지 체크
-        if (favoriteRepository.existsByUserAndCertificate(userId, certificateId)) {
+        if (favoriteRepository.existsByUserIdAndCertificateId(userId, certificateId)) {
             throw new IllegalArgumentException("이미 즐겨찾기에 등록된 자격증입니다.");
         }
 
