@@ -1,6 +1,7 @@
 package com.example.certif.controller;
 
 import com.example.certif.dto.ScheduleDto;
+import com.example.certif.security.UserPrincipal;
 import com.example.certif.service.ScheduleService;
 import com.example.certif.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -32,13 +35,13 @@ public class ScheduleController {
     // 예시 /api/schedules/favorites?startDate=2025-08-01&endDate=2025-08-31
     @GetMapping("/api/schedules/favorites")
     public ResponseEntity<List<ScheduleDto>> getFavoriteSchedules(
-            @RequestHeader("Authorization") String authHeader,
+            @AuthenticationPrincipal UserPrincipal principal,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
         // "Bearer" 제거
-        String token = authHeader.replace("Bearer ", "");
-        Long userId = jwtUtil.getUserIdFromToken(token);
+
+        Long userId = principal.getUserId();
         List<ScheduleDto> dtos = scheduleService.getFavoriteSchedulesInPeriod(userId, startDate, endDate);
         return ResponseEntity.status(HttpStatus.OK).body(dtos);
     }
