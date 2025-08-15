@@ -39,8 +39,6 @@ public class ScheduleController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
     ) {
-        // "Bearer" 제거
-
         Long userId = principal.getUserId();
         List<ScheduleDto> dtos = scheduleService.getFavoriteSchedulesInPeriod(userId, startDate, endDate);
         return ResponseEntity.status(HttpStatus.OK).body(dtos);
