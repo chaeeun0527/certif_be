@@ -23,9 +23,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/signup",
                                 "/api/auth/login",
-                                "/api/certificates",
-                                "/api/categories",
-                                "/api/certificates/{certificateId}/schedules"
+                                "/api/auth/check-nickname",
+                                "/api/auth/check-email",
+                                "/api/categories/**",
+                                "/api/certificates/**"
                         ).permitAll()
                         .anyRequest().authenticated()
                 )

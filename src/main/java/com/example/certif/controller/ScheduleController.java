@@ -22,7 +22,6 @@ import java.util.List;
 public class ScheduleController {
 
     private final ScheduleService scheduleService;
-    private final JwtUtil jwtUtil;
 
     // 1. 특정 자격증 일정 조회
     @GetMapping("/api/certificates/{certificateId}/schedules")

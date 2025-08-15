@@ -20,7 +20,6 @@ import java.util.List;
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
-    private final JwtUtil jwtUtil;
 
     // 1. 사용자의 즐겨찾기 자격증 목록 조회
     @GetMapping
