@@ -3,7 +3,6 @@ package com.example.certif.controller;
 import com.example.certif.dto.FavoriteCertificateDto;
 import com.example.certif.security.UserPrincipal;
 import com.example.certif.service.FavoriteService;
-import com.example.certif.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

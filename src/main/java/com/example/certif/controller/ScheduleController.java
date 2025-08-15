@@ -3,14 +3,12 @@ package com.example.certif.controller;
 import com.example.certif.dto.ScheduleDto;
 import com.example.certif.security.UserPrincipal;
 import com.example.certif.service.ScheduleService;
-import com.example.certif.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
