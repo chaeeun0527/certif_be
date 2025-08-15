@@ -26,33 +26,28 @@ public class Certificate {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    @Lob
-    @Column
+    @Column(length = 500)
     private String overview;
 
-    @Column(name = "official_site")
+    @Column(name = "official_site", length = 500)
     private String officialSite;
 
     @Column
     private String organization;
 
-    @Lob
-    @Column(name = "exam_method")
-    private String examMethod;
-
-    @Lob
-    @Column(name = "passing_criteria")
-    private String passingCriteria;
-
-    @Lob
-    @Column
-    private String qualification;
-
     @Column
     private String fee;
 
-    @Lob
-    @Column
+    @Column(name = "exam_method", length = 500)
+    private String examMethod;
+
+    @Column(name = "passing_criteria", length = 500)
+    private String passingCriteria;
+
+    @Column(length = 1000)
+    private String qualification;
+
+    @Column(length = 1000)
     private String features;
 
 }
