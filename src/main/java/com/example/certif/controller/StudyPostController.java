@@ -4,12 +4,14 @@ import com.example.certif.dto.StudyPostCreateDto;
 import com.example.certif.dto.StudyPostResponseDto;
 import com.example.certif.dto.StudyPostUpdateDto;
 import com.example.certif.entity.User;
+import com.example.certif.security.UserPrincipal;
 import com.example.certif.service.StudyPostService;
 import com.example.certif.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,34 +48,34 @@ public class StudyPostController {
 
     //  2. 스터디 게시판 글 생성
     @PostMapping
-    public ResponseEntity<StudyPostResponseDto> create(@RequestBody StudyPostCreateDto dto,
-                                                       @RequestHeader("Authorization") String authHeader){
-        String token = authHeader.replace("Bearer ", "");
-        Long userId = jwtUtil.getUserIdFromToken(token);
+    public ResponseEntity<StudyPostResponseDto> create(
+            @RequestBody StudyPostCreateDto dto,
+            @AuthenticationPrincipal UserPrincipal principal) {
 
+        Long userId = principal.getUserId();
         StudyPostResponseDto createdDto = studyPostService.create(dto, userId);
         return ResponseEntity.status(HttpStatus.OK).body(createdDto);
     }
 
     // 3. 스터디 게시판 글 수정
     @PatchMapping("/{postId}")
-    public ResponseEntity<StudyPostResponseDto> update(@PathVariable Long postId,
-                                                       @RequestBody StudyPostUpdateDto dto,
-                                                       @RequestHeader("Authorization") String authHeader){
-        String token = authHeader.replace("Bearer ", "");
-        Long userId = jwtUtil.getUserIdFromToken(token);
+    public ResponseEntity<StudyPostResponseDto> update(
+            @PathVariable Long postId,
+            @RequestBody StudyPostUpdateDto dto,
+            @AuthenticationPrincipal UserPrincipal principal) {
 
+        Long userId = principal.getUserId();
         StudyPostResponseDto updatedDto = studyPostService.update(postId, dto, userId);
         return ResponseEntity.status(HttpStatus.OK).body(updatedDto);
     }
 
     // 4. 스터디 게시판 글 삭제
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId,
-                                           @RequestHeader("Authorization") String authHeader){
-        String token = authHeader.replace("Bearer ", "");
-        Long userId = jwtUtil.getUserIdFromToken(token);
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserPrincipal principal) {
 
+        Long userId = principal.getUserId();
         studyPostService.delete(postId, userId); // 작성자 확인 포함
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
