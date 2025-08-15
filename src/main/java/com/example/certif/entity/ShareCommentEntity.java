@@ -22,8 +22,14 @@ public class ShareCommentEntity {
     private String content;
 
     // 사용자 ID
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn (name = "user_id", nullable = false)
+    private User user;
+
+    // 게시물과 관계
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id", nullable = false)
+    private SharePostEntity sharePost;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -33,15 +39,12 @@ public class ShareCommentEntity {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    // 게시물과 관계
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "post_id", nullable = false)
-    private SharePostEntity sharePost;
+
 
     @Builder
-    public ShareCommentEntity(String content, Long userId, SharePostEntity sharePost){
+    public ShareCommentEntity(String content, User user, SharePostEntity sharePost){
         this.content = content;
-        this.userId = userId;
+        this.user = user;
         this.sharePost = sharePost;
     }
 

@@ -20,7 +20,7 @@ public class SharePostResponseDto {
     private Long id;
     private String title;
     private String content;
-    private Long userId;
+    private String nickname;
     private Long categoryId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -31,8 +31,8 @@ public class SharePostResponseDto {
         this.id = entity.getId();
         this.title = entity.getTitle();
         this.content = entity.getContent();
-        this.userId = entity.getUserId();
-        this.categoryId = entity.getCategoryId();
+        this.nickname = entity.getUser().getNickname();
+        this.categoryId = entity.getCategory().getId();
         this.createdAt = entity.getCreatedAt();
         this.updatedAt = entity.getUpdatedAt();
         this.commnets = entity.getComments().stream()

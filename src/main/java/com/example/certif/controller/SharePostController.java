@@ -2,6 +2,8 @@ package com.example.certif.controller;
 
 import com.example.certif.dto.*;
 import com.example.certif.service.ShareService;
+import com.example.certif.util.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,8 +21,20 @@ public class SharePostController {
     @Autowired
     private ShareService shareService;
 
-    // 임시 사용자 ID
-    private static final Long loggedInUserId = 1L;
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    // JWT 토큰에서 userId 추출 메서드
+    private Long getUserIdFromRequest(HttpServletRequest request){
+        String authHeader = request.getHeader("Authorization");
+        if(authHeader != null && authHeader.startsWith("Bearer ")){
+            String token = authHeader.substring(7);
+            if(jwtUtil.validateToken(token)){
+                return jwtUtil.getUserIdFromToken(token);
+            }
+        }
+        throw new IllegalArgumentException("유효하지 않은 토큰입니다.");
+    }
 
     //글 전체 목록 조회 - 첫번째 카테고리
     @GetMapping("/default")
@@ -46,8 +60,9 @@ public class SharePostController {
 
     // 게시물 등록
     @PostMapping
-    public ResponseEntity<SharePostResponseDto> createPost(@RequestBody @Valid SharePostCreateRequestDto requestDto) {
-        SharePostResponseDto newPost = shareService.createPost(requestDto, loggedInUserId);
+    public ResponseEntity<SharePostResponseDto> createPost(@RequestBody @Valid SharePostCreateRequestDto requestDto, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        SharePostResponseDto newPost = shareService.createPost(requestDto, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(newPost);
 
     }
@@ -55,15 +70,17 @@ public class SharePostController {
     //게시물 수정
     @PatchMapping("/{postId}")
     public ResponseEntity<SharePostResponseDto> updatePost(
-            @PathVariable Long postId, @RequestBody @Valid SharePostUpdateRequestDto requestDto) {
-        SharePostResponseDto updatedPost = shareService.updatePost(postId, requestDto, loggedInUserId);
+            @PathVariable Long postId, @RequestBody @Valid SharePostUpdateRequestDto requestDto, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        SharePostResponseDto updatedPost = shareService.updatePost(postId, requestDto, userId);
         return ResponseEntity.ok(updatedPost);
     }
 
     //게시물 삭제
     @DeleteMapping("/{postId}")
-    public ResponseEntity<Void> deletePost(@PathVariable Long postId) {
-        shareService.deletePost(postId, loggedInUserId);
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId, HttpServletRequest request) {
+        Long userId = getUserIdFromRequest(request);
+        shareService.deletePost(postId, userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -78,8 +95,9 @@ public class SharePostController {
     @PostMapping("/{postId}/comments")
     public ResponseEntity<ShareCommentResponseDto> createComment(
             @PathVariable Long postId,
-            @RequestBody @Valid ShareCommentCreateRequestDto requestDto){
-        ShareCommentResponseDto newComment = shareService.createComment(postId, requestDto, loggedInUserId);
+            @RequestBody @Valid ShareCommentCreateRequestDto requestDto, HttpServletRequest request){
+        Long userId = getUserIdFromRequest(request);
+        ShareCommentResponseDto newComment = shareService.createComment(postId, requestDto, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(newComment);
 
     }
@@ -88,8 +106,10 @@ public class SharePostController {
     public ResponseEntity<ShareCommentResponseDto> updateComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
-            @RequestBody @Valid ShareCommentUpdateRequestDto requestDto ){
-        ShareCommentResponseDto updatedComment = shareService.updateComment(commentId, requestDto, loggedInUserId);
+            @RequestBody @Valid ShareCommentUpdateRequestDto requestDto,
+            HttpServletRequest request){
+        Long userId = getUserIdFromRequest(request);
+        ShareCommentResponseDto updatedComment = shareService.updateComment(commentId, requestDto, userId);
         return ResponseEntity.ok(updatedComment);
     }
 
@@ -97,14 +117,16 @@ public class SharePostController {
     @DeleteMapping("/{postId}/comments/{commentId}")
     public ResponseEntity<Void> deleteCommnet(
             @PathVariable Long postId,
-            @PathVariable Long commentId){
-        shareService.deleteComment(commentId, loggedInUserId);
+            @PathVariable Long commentId,
+            HttpServletRequest request){
+        Long userId = getUserIdFromRequest(request);
+        shareService.deleteComment(commentId, userId);
         return ResponseEntity.noContent().build();
     }
 
 }
 
-    //e
+
 
 
 

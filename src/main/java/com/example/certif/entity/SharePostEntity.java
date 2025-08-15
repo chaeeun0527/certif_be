@@ -1,9 +1,7 @@
 package com.example.certif.entity;
 
 import jakarta.persistence.*;
-import jdk.jfr.Category;
 import lombok.*;
-import org.apache.catalina.User;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -50,11 +48,12 @@ public class SharePostEntity {
 
 
 
+    @Builder.Default
     @OneToMany(mappedBy = "sharePost", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ShareCommentEntity> comments = new ArrayList<>();
 
     @Builder
-    public SharePostEntity(String title, String content, Long userId, Long categoryId){
+    public SharePostEntity(String title, String content, com.example.certif.entity.User user, com.example.certif.entity.Category category){
         this.title = title;
         this.content = content;
         this.user = user;
@@ -62,14 +61,14 @@ public class SharePostEntity {
     }
 
     // 게시물 수정 메서드
-    public void update(String title, String content, Long categoryId){
+    public void update(String title, String content, Category category){
         if(title != null && !title.isEmpty()){
             this.title = title;
         }
         if(content != null && !content.isEmpty()){
             this.content = content;
         }
-        if(categoryId != null){
+        if(category != null){
             this.category = category;
         }
     }

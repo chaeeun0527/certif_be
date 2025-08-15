@@ -1,12 +1,15 @@
 package com.example.certif.service;
 
 import com.example.certif.dto.*;
+import com.example.certif.entity.Category;
 import com.example.certif.entity.ShareCommentEntity;
 import com.example.certif.entity.SharePostEntity;
+import com.example.certif.entity.User;
+import com.example.certif.repository.CategoryRepository;
 import com.example.certif.repository.ShareCommentRepository;
 import com.example.certif.repository.SharePostRepository;
+import com.example.certif.repository.UserRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.catalina.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +26,12 @@ public class ShareService {
 
     @Autowired
     private ShareCommentRepository shareCommentRepository;
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository;
 
     // 게시물 관련 서비스
 
@@ -57,7 +66,10 @@ public class ShareService {
     // 게시물 - 4. 게시물 등록
     @Transactional
     public SharePostResponseDto createPost(SharePostCreateRequestDto dto, Long userId){
-        SharePostEntity newPost = dto.toEntity(userId);
+        User user = userRepository.findById(userId).orElseThrow(()-> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
+        Category category = categoryRepository.findById(dto.getCategoryId()).orElseThrow(()-> new IllegalArgumentException("카테고리를 찾을 수 없습니다"));
+
+        SharePostEntity newPost = dto.toEntity(user, category);
         SharePostEntity savedPost = sharePostRepository.save(newPost);
         return new SharePostResponseDto(savedPost);
     }
@@ -68,7 +80,8 @@ public class ShareService {
         SharePostEntity target = sharePostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다: " + postId));
 
-        target.update(dto.getTitle(), dto.getContent(), dto.getCategoryId());
+        Category category = categoryRepository.findById(dto.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다"));
+        target.update(dto.getTitle(), dto.getContent(), category);
         SharePostEntity updatedPost = sharePostRepository.save(target);
         return new SharePostResponseDto(updatedPost);
 
@@ -99,7 +112,9 @@ public class ShareService {
         SharePostEntity sharePost = sharePostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다: " + postId));
 
-        ShareCommentEntity newComment = dto.toEntity(userId, sharePost);
+        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다"));
+
+        ShareCommentEntity newComment = dto.toEntity(user, sharePost);
         ShareCommentEntity savedComment = shareCommentRepository.save(newComment);
         return new ShareCommentResponseDto(savedComment);
     }
