@@ -27,7 +27,7 @@ public class StudyCommentController {
     private StudyPostService studyPostService;
 
     // 1. 스터디 게시판 글의 댓글 조회
-    @GetMapping("api/study/{postId}/comments")
+    @GetMapping("/api/study/{postId}/comments")
     public ResponseEntity<List<StudyCommentDto>> getComments(@PathVariable Long postId) {
         // 서비스에 위임
         List<StudyCommentDto> dtos = studyCommentService.comments(postId);
