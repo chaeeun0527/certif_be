@@ -6,6 +6,7 @@ import com.example.certif.repository.PostRepository;
 import com.example.certif.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +14,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -22,13 +25,18 @@ public class UserService {
     private final UserRepository userRepository;
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    @Value("${user.profile-image.dir:uploads/profile-images}")
-    private String profileImageDir;
+    // 임시 토큰 저장용 (배포 시에는 DB 또는 Redis 사용 권장)
+    private final Map<String, String> resetTokens = new HashMap<>();
+
+    // 프로필 이미지 저장 기본 폴더 (서버 배포 환경에서도 사용 가능)
+    private final Path baseFolder = Paths.get(System.getProperty("user.home"), "app-data", "profile-images");
 
     public User getMyInfo(String email) {
         return userRepository.findByEmail(email).orElseThrow();
     }
+
 
     public void sendPasswordResetToken(String email) {
         // 이메일로 토큰 발송 로직 (생략)
@@ -70,43 +78,43 @@ public class UserService {
         postRepository.deleteById(postId);
     }
 
-    // 프로필 이미지
+    // 프로필 이미지 업로드
     public void uploadProfileImage(String email, MultipartFile image) {
 
-        // 저장할 폴더 경로
-        String folder = System.getProperty("java.io.tmpdir") + "/uploads/profile-images";
-        Path folderPath = Paths.get(folder);
-
         // 폴더가 없으면 생성
-        if (!Files.exists(folderPath)) {
+        if (!Files.exists(baseFolder)) {
             try {
-                Files.createDirectories(folderPath);
+                Files.createDirectories(baseFolder);
             } catch (IOException e) {
                 throw new RuntimeException("폴더 생성 실패", e);
             }
         }
 
         // 저장할 파일 이름: 이메일_현재시간.확장자
-        String filename = email + "_" + System.currentTimeMillis() + ".png"; // 예시는 png
-        Path filePath = folderPath.resolve(filename);
+        String filename = email + "_" + System.currentTimeMillis() + getExtension(image.getOriginalFilename());
+        Path filePath = baseFolder.resolve(filename);
 
+        // 파일 저장
         try {
             image.transferTo(filePath.toFile());
         } catch (IOException e) {
             throw new RuntimeException("파일 저장 실패", e);
         }
 
+        // DB 업데이트
         User user = userRepository.findByEmail(email).orElseThrow();
         user.setProfileImageUrl(filePath.toString());
         userRepository.save(user);
     }
 
+    // 기존 이미지 제거 후 변경
     public void updateProfileImage(String email, MultipartFile image) {
         User user = userRepository.findByEmail(email).orElseThrow();
+
         deleteExistingFile(user.getProfileImageUrl());
-        String filename = saveFile(image, email);
-        user.setProfileImageUrl("/profile-images/" + filename);
-        userRepository.save(user);
+
+        // 새 이미지 업로드
+        uploadProfileImage(email, image);
     }
 
     public void deleteProfileImage(String email) {
@@ -116,38 +124,45 @@ public class UserService {
         userRepository.save(user);
     }
 
-    // 파일 처리
-    private String saveFile(MultipartFile file, String email) {
-        try {
-            String originalFilename = file.getOriginalFilename();
-            String ext = originalFilename != null && originalFilename.contains(".")
-                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
-                    : ".jpg";
+//    // 파일 처리
+//    private String saveFile(MultipartFile file, String email) {
+//        try {
+//            String originalFilename = file.getOriginalFilename();
+//            String ext = originalFilename != null && originalFilename.contains(".")
+//                    ? originalFilename.substring(originalFilename.lastIndexOf("."))
+//                    : ".jpg";
+//
+//            String filename = email + "_" + System.currentTimeMillis() + ext;
+//            Path uploadPath = Paths.get(profileImageDir);
+//            if (!Files.exists(uploadPath)) {
+//                Files.createDirectories(uploadPath);
+//            }
+//
+//            Path filePath = uploadPath.resolve(filename);
+//            file.transferTo(filePath.toFile());
+//            return filename;
+//        } catch (IOException e) {
+//            throw new RuntimeException("프로필 이미지 저장 실패", e);
+//        }
+//    }
 
-            String filename = email + "_" + System.currentTimeMillis() + ext;
-            Path uploadPath = Paths.get(profileImageDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
+    // 파일 삭제 유틸
+    private void deleteExistingFile(String pathStr) {
+        if (pathStr == null) return;
+        Path path = Paths.get(pathStr);
+        try {
+            if (Files.exists(path)) {
+                Files.delete(path);
             }
-
-            Path filePath = uploadPath.resolve(filename);
-            file.transferTo(filePath.toFile());
-            return filename;
         } catch (IOException e) {
-            throw new RuntimeException("프로필 이미지 저장 실패", e);
+            throw new RuntimeException("파일 삭제 실패", e);
         }
     }
 
-    private void deleteExistingFile(String url) {
-        if (url == null || url.isBlank()) return;
-
-        String filename = url.substring(url.lastIndexOf("/") + 1);
-        Path filePath = Paths.get(profileImageDir).resolve(filename);
-        try {
-            Files.deleteIfExists(filePath);
-        } catch (IOException e) {
-            // 로그 남기고 무시 가능
-            e.printStackTrace();
-        }
+    // 파일 확장자 추출
+    private String getExtension(String filename) {
+        if (filename == null || !filename.contains(".")) return "";
+        return filename.substring(filename.lastIndexOf("."));
     }
+
 }
