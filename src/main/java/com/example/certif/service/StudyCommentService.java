@@ -9,6 +9,7 @@ import com.example.certif.repository.StudyPostRepository;
 import com.example.certif.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,8 +20,11 @@ import java.util.List;
 
 public class StudyCommentService {
 
+    @Autowired
     private StudyCommentRepository studyCommentRepository;
+    @Autowired
     private StudyPostRepository studyPostRepository;
+    @Autowired
     private UserRepository userRepository;
 
 
