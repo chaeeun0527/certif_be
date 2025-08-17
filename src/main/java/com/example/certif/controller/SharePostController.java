@@ -32,14 +32,14 @@ public class SharePostController {
     }
 
     //카테고리별 게시물 목록 조회
-    @GetMapping("/{categoryId}")
+    @GetMapping("/category/{categoryId}")
     public ResponseEntity<List<SharePostResponseDto>> getPostsByCategory(@PathVariable Long categoryId) {
         List<SharePostResponseDto> posts = shareService.findPostsByCategoryId(categoryId);
         return ResponseEntity.ok(posts);
     }
 
     //특정 글 내용 조회
-    @GetMapping("/{postId}")
+    @GetMapping("/posts/{postId}")
     public ResponseEntity<SharePostResponseDto> getPostById(@PathVariable Long postId) {
         SharePostResponseDto post = shareService.findPostById(postId);
         return ResponseEntity.ok(post);
@@ -55,10 +55,12 @@ public class SharePostController {
         Long userId = userPrincipal.getUserId();
         SharePostResponseDto newPost = shareService.createPost(requestDto, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(newPost);
+
+
     }
 
     // 게시물 수정
-    @PatchMapping("/{postId}")
+    @PatchMapping("/posts/{postId}")
     public ResponseEntity<SharePostResponseDto> updatePost(
             @PathVariable Long postId,
             @RequestBody @Valid SharePostUpdateRequestDto requestDto,
@@ -70,7 +72,7 @@ public class SharePostController {
     }
 
     // 게시물 삭제
-    @DeleteMapping("/{postId}")
+    @DeleteMapping("/posts/{postId}")
     public ResponseEntity<Void> deletePost(
             @PathVariable Long postId,
             @AuthenticationPrincipal UserPrincipal userPrincipal) {
@@ -81,14 +83,14 @@ public class SharePostController {
     }
 
     //댓글 목록 조회
-    @GetMapping("/{postId}/comments")
+    @GetMapping("/posts/{postId}/comments")
     public ResponseEntity<List<ShareCommentResponseDto>> getCommentsByPostId(@PathVariable Long postId){
         List<ShareCommentResponseDto> comments = shareService.findCommentsByPostId(postId);
         return ResponseEntity.ok(comments);
     }
 
     // 댓글 등록
-    @PostMapping("/{postId}/comments")
+    @PostMapping("/posts/{postId}/comments")
     public ResponseEntity<ShareCommentResponseDto> createComment(
             @PathVariable Long postId,
             @RequestBody @Valid ShareCommentCreateRequestDto requestDto,
@@ -100,7 +102,7 @@ public class SharePostController {
     }
 
     // 댓글 수정
-    @PatchMapping("/{postId}/comments/{commentId}")
+    @PatchMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<ShareCommentResponseDto> updateComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,
@@ -113,7 +115,7 @@ public class SharePostController {
     }
 
     // 댓글 삭제
-    @DeleteMapping("/{postId}/comments/{commentId}")
+    @DeleteMapping("/posts/{postId}/comments/{commentId}")
     public ResponseEntity<Void> deleteComment(
             @PathVariable Long postId,
             @PathVariable Long commentId,

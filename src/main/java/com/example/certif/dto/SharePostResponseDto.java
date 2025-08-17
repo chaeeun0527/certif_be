@@ -24,7 +24,7 @@ public class SharePostResponseDto {
     private Long categoryId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<ShareCommentResponseDto> commnets;
+    private List<ShareCommentResponseDto> comments;
 
     // Entity -> DTO 변환
     public SharePostResponseDto(SharePostEntity entity){
@@ -35,7 +35,7 @@ public class SharePostResponseDto {
         this.categoryId = entity.getCategory().getId();
         this.createdAt = entity.getCreatedAt();
         this.updatedAt = entity.getUpdatedAt();
-        this.commnets = entity.getComments().stream()
+        this.comments = entity.getComments().stream()
                 .map(ShareCommentResponseDto::new)
                 .collect(Collectors.toList());
 

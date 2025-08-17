@@ -49,6 +49,7 @@ public class ShareService {
     // 게시물 - 2. 카테고리별 게시물 목록 조회
     @Transactional(readOnly = true)
     public List<SharePostResponseDto> findPostsByCategoryId(Long categoryId) {
+        Category category = categoryRepository.findById(categoryId).orElseThrow(() -> new IllegalArgumentException("존재하지 않는 카테고리입니다."));
         List<SharePostEntity> entities = sharePostRepository.findByCategoryId(categoryId);
         return entities.stream()
                 .map(SharePostResponseDto::new)
@@ -80,7 +81,12 @@ public class ShareService {
         SharePostEntity target = sharePostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다: " + postId));
 
+        //작성자 확인
+        if(!target.getUser().getId().equals(userId)){
+            throw new IllegalArgumentException("수정 권한이 없습니다.");
+        }
         Category category = categoryRepository.findById(dto.getCategoryId()).orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다"));
+
         target.update(dto.getTitle(), dto.getContent(), category);
         SharePostEntity updatedPost = sharePostRepository.save(target);
         return new SharePostResponseDto(updatedPost);
@@ -92,6 +98,10 @@ public class ShareService {
         SharePostEntity target = sharePostRepository.findById(postId)
                 .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다: " + postId));
 
+        //작성자 확인
+        if(!target.getUser().getId().equals(userId)){
+            throw new IllegalArgumentException("삭제 권한이 없습니다.");
+        }
         sharePostRepository.delete(target);
     }
 
@@ -125,6 +135,10 @@ public class ShareService {
         ShareCommentEntity target = shareCommentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다.: " + commentId));
 
+        //작성자 확인
+        if(!target.getUser().getId().equals(userId)){
+            throw new IllegalArgumentException("수정 권한이 없습니다.");
+        }
         target.update(dto.getContent());
         ShareCommentEntity updatedCommnet = shareCommentRepository.save(target);
         return new ShareCommentResponseDto(updatedCommnet);
@@ -138,6 +152,10 @@ public class ShareService {
         ShareCommentEntity target = shareCommentRepository.findById(commentId)
                 .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다: " + commentId));
 
+        //작성자 확인
+        if(!target.getUser().getId().equals(userId)){
+            throw new IllegalArgumentException("삭제 권한이 없습니다.");
+        }
         shareCommentRepository.delete(target);
     }
 }
