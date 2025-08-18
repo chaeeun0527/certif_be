@@ -2,9 +2,11 @@ package com.example.certif.controller;
 
 import com.example.certif.dto.*;
 import com.example.certif.entity.User;
+import com.example.certif.security.UserPrincipal;
 import com.example.certif.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,15 +20,20 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping("/my-page")
-    public ResponseEntity<User> getMyPage(@RequestParam String email) {
-        return ResponseEntity.ok(userService.getMyInfo(email));
+    public ResponseEntity<User> getMyPage(@AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(userService.getMyInfo(principal.getUsername()));
+        // getUsername()이 email 반환
     }
 
     @PostMapping("/request-password-reset")
-    public ResponseEntity<String> requestPasswordReset(@RequestBody PasswordResetTokenRequest request) {
-        userService.sendPasswordResetToken(request.getEmail());
+    public ResponseEntity<String> requestPasswordReset(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        String email = principal.getUsername();
+        userService.sendPasswordResetToken(email);
         return ResponseEntity.ok("비밀번호 재설정 이메일 전송 완료");
     }
+
 
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody PasswordResetRequest request) {
@@ -35,8 +42,8 @@ public class UserController {
     }
 
     @GetMapping("/my-comments")
-    public ResponseEntity<List<String>> getMyComments(@RequestParam String email) {
-        return ResponseEntity.ok(userService.getMyComments(email));
+    public ResponseEntity<List<String>> getMyComments(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(userService.getMyComments(userPrincipal.getUsername())); // username = email
     }
 
     @PatchMapping("/my-comments/{id}")
@@ -52,8 +59,8 @@ public class UserController {
     }
 
     @GetMapping("/my-posts")
-    public ResponseEntity<List<String>> getMyPosts(@RequestParam String email) {
-        return ResponseEntity.ok(userService.getMyPosts(email));
+    public ResponseEntity<List<String>> getMyPosts(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        return ResponseEntity.ok(userService.getMyPosts(userPrincipal.getUsername()));
     }
 
     @PatchMapping("/my-posts/{id}")
@@ -69,20 +76,26 @@ public class UserController {
     }
 
     @PostMapping("/profile-image")
-    public ResponseEntity<String> uploadProfileImage(@RequestParam MultipartFile image, @RequestParam String email) {
-        userService.uploadProfileImage(email, image);
+    public ResponseEntity<String> uploadProfileImage(
+            @RequestParam MultipartFile image,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        userService.uploadProfileImage(userPrincipal.getUsername(), image);
         return ResponseEntity.ok("프로필 이미지 업로드 완료");
     }
 
     @PatchMapping("/profile-image")
-    public ResponseEntity<String> updateProfileImage(@RequestParam MultipartFile image, @RequestParam String email) {
-        userService.updateProfileImage(email, image);
+    public ResponseEntity<String> updateProfileImage(
+            @RequestParam MultipartFile image,
+            @AuthenticationPrincipal UserPrincipal userPrincipal
+    ) {
+        userService.updateProfileImage(userPrincipal.getUsername(), image);
         return ResponseEntity.ok("프로필 이미지 수정 완료");
     }
 
     @DeleteMapping("/profile-image")
-    public ResponseEntity<String> deleteProfileImage(@RequestParam String email) {
-        userService.deleteProfileImage(email);
+    public ResponseEntity<String> deleteProfileImage(@AuthenticationPrincipal UserPrincipal userPrincipal) {
+        userService.deleteProfileImage(userPrincipal.getUsername());
         return ResponseEntity.ok("프로필 이미지 삭제 완료");
     }
 }

@@ -64,4 +64,29 @@ public class User {
     public Long getId() {
         return this.id;
     }
+
+    public void setProfileImageUrl(String url) {
+        this.profileImage = url;
+    }
+
+    public String getProfileImageUrl() {
+        return this.profileImage;
+    }
+
+    // 비밀번호 재설정 토큰 관련
+    public void setPasswordResetToken(String token) {
+        this.passwordResetToken = token;
+    }
+
+    public String getPasswordResetToken() {
+        return this.passwordResetToken;
+    }
+
+    public void setPasswordResetExpiry(LocalDateTime expiry) {
+        this.passwordResetExpiry = expiry;
+    }
+
+    public LocalDateTime getPasswordResetExpiry() {
+        return this.passwordResetExpiry;
+    }
 }
