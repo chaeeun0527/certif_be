@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Builder
-public class SharePostEntity {
+public class SharePost {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,10 +50,10 @@ public class SharePostEntity {
 
     @Builder.Default
     @OneToMany(mappedBy = "sharePost", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ShareCommentEntity> comments = new ArrayList<>();
+    private List<ShareComment> comments = new ArrayList<>();
 
     @Builder
-    public SharePostEntity(String title, String content, com.example.certif.entity.User user, com.example.certif.entity.Category category){
+    public SharePost(String title, String content, com.example.certif.entity.User user, com.example.certif.entity.Category category){
         this.title = title;
         this.content = content;
         this.user = user;
