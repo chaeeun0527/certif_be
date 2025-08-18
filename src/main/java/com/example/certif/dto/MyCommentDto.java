@@ -1,9 +1,7 @@
 package com.example.certif.dto;
 
 import com.example.certif.entity.ShareComment;
-import com.example.certif.entity.SharePost;
 import com.example.certif.entity.StudyComment;
-import com.example.certif.entity.StudyPost;
 import lombok.*;
 
 import java.time.LocalDateTime;
