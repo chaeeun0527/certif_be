@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,9 +12,10 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
+@Setter
 @NoArgsConstructor
 @Table(name = "share_comment")
-public class ShareCommentEntity {
+public class ShareComment {
 
     @Id
     @GeneratedValue(strategy =  GenerationType.IDENTITY)
@@ -30,7 +32,7 @@ public class ShareCommentEntity {
     // 게시물과 관계
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
-    private SharePostEntity sharePost;
+    private SharePost sharePost;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -43,7 +45,7 @@ public class ShareCommentEntity {
 
 
     @Builder
-    public ShareCommentEntity(String content, User user, SharePostEntity sharePost){
+    public ShareComment(String content, User user, SharePost sharePost){
         this.content = content;
         this.user = user;
         this.sharePost = sharePost;
@@ -55,4 +57,5 @@ public class ShareCommentEntity {
             this.content = content;
         }
     }
+
 }

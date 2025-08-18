@@ -4,6 +4,7 @@ import com.example.certif.entity.StudyPost;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface StudyPostRepository extends JpaRepository<StudyPost, Long> {
@@ -13,4 +14,6 @@ public interface StudyPostRepository extends JpaRepository<StudyPost, Long> {
 
     // 게시글 ID로 조회
     Optional<StudyPost> findById(Long id);
+
+    List<StudyPost> findByUserEmail(String email);
 }
