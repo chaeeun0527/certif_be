@@ -102,16 +102,18 @@ public class UserService {
 
     // 내가 쓴 게시글 수정
     @Transactional
-    public void updatePost(Long postId, String content, String type, String email) throws AccessDeniedException {
+    public void updatePost(Long postId, String title, String content, String type, String email) throws AccessDeniedException {
         if ("study".equals(type)) {
             var post = studyPostRepository.findById(postId).orElseThrow();
             if (!post.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            post.setTitle(title);
             post.setContent(content);
             studyPostRepository.save(post);
         }
         else if ("share".equals(type)) {
             var post = sharePostRepository.findById(postId).orElseThrow();
             if (!post.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            post.setTitle(title);
             post.setContent(content);
             sharePostRepository.save(post);
         } else throw new IllegalArgumentException("올바른 게시판 타입이 아닙니다.");

@@ -65,10 +65,11 @@ public class UserController {
     public ResponseEntity<String> updatePost(
             @PathVariable String type,
             @PathVariable Long postId,
-            @RequestParam String content,
+            @RequestBody String title,
+            @RequestBody String content,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        userService.updatePost(postId, content, type, principal.getUsername());
+        userService.updatePost(postId, title, content, type, principal.getUsername());
         return ResponseEntity.ok("게시글 수정 완료");
     }
 
@@ -104,7 +105,7 @@ public class UserController {
     public ResponseEntity<String> updateComment(
             @PathVariable String type,
             @PathVariable Long commentId,
-            @RequestParam String content,
+            @RequestBody String content,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
         userService.updateComment(commentId, content, type, principal.getUsername());
