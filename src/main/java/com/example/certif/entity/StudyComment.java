@@ -48,7 +48,7 @@ public class StudyComment {
             throw new IllegalArgumentException("댓글 생성 실패! 게시글의 id가 잘못됐습니다");
 
         return new StudyComment(
-                null,               // id는 null로 둬서 DB에서 생성
+                null,               // id는 null로 둔 채로 생성하기
                 dto.getContent(),   // content
                 null,               // createdAt 자동생성 -> null 전달
                 null,               // updatedAt 자동생성 -> null 전달
