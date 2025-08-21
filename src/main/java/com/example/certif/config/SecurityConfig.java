@@ -51,7 +51,7 @@ public class SecurityConfig {
         // 허용할 프론트 주소들
         configuration.setAllowedOrigins(List.of(
                 "http://localhost:3000",
-                "https://your-frontend.com" // 배포 환경 프론트 주소
+                "https://certif3.netlify.app" // 배포 환경 프론트 주소
         ));
 
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
