@@ -18,9 +18,6 @@ public interface StudyPostRepository extends JpaRepository<StudyPost, Long> {
     Optional<StudyPost> findById(Long id);
 
     // DTO로 바로 조회
-    @Query("SELECT new com.example.certif.dto.MyPostDto(p.id, p.title, p.content, 'study', p.createdAt, p.updatedAt) " +
-            "FROM StudyPost p " +
-            "JOIN p.user u " +
-            "WHERE u.email = :email")
-    List<MyPostDto> findMyPostsByUserEmail(@Param("email") String email);
+    // 이메일 기준으로 엔티티 조회
+    List<StudyPost> findByUserEmail(String email);
 }

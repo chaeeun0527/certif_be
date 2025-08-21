@@ -2,7 +2,7 @@ package com.example.certif.service;
 
 import com.example.certif.dto.MyCommentDto;
 import com.example.certif.dto.MyPostDto;
-import com.example.certif.entity.User;
+import com.example.certif.entity.*;
 import com.example.certif.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -79,8 +79,16 @@ public class UserService {
     // 내가 쓴 게시글 목록 조회
     public List<MyPostDto> getMyPosts(String email) {
         List<MyPostDto> result = new ArrayList<>();
-        result.addAll(studyPostRepository.findMyPostsByUserEmail(email));
-        result.addAll(sharePostRepository.findMyPostsByUserEmail(email));
+
+        List<StudyPost> studyPosts = studyPostRepository.findByUserEmail(email);
+        List<SharePost> sharePosts = sharePostRepository.findByUserEmail(email);
+
+        for (StudyPost post : studyPosts) {
+            result.add(MyPostDto.fromEntity(post, "study")); // DTO 변환 시 type 포함
+        }
+        for (SharePost post : sharePosts) {
+            result.add(MyPostDto.fromEntity(post, "share"));
+        }
         return result;
     }
 
@@ -138,8 +146,15 @@ public class UserService {
     public List<MyCommentDto> getMyComments(String email) {
         List<MyCommentDto> result = new ArrayList<>();
 
-        result.addAll(studyCommentRepository.findMyCommentsByUserEmail(email));
-        result.addAll(shareCommentRepository.findMyCommentsByUserEmail(email));
+        List<StudyComment> studyComments = studyCommentRepository.findByUserEmail(email);
+        List<ShareComment> shareComments = shareCommentRepository.findByUserEmail(email);
+
+        for (StudyComment comment : studyComments) {
+            result.add(MyCommentDto.fromEntity(comment, "study")); // DTO 변환 시 postId, postTitle 포함
+        }
+        for (ShareComment comment : shareComments) {
+            result.add(MyCommentDto.fromEntity(comment, "share"));
+        }
         return result;
     }
 

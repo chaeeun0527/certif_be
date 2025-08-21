@@ -14,9 +14,6 @@ public interface SharePostRepository extends JpaRepository<SharePost, Long> {
 
     List<SharePost> findByCategoryId(Long categoryId);
 
-    @Query("SELECT new com.example.certif.dto.MyPostDto(p.id, p.title, p.content, 'share', p.createdAt, p.updatedAt) " +
-            "FROM SharePost p " +
-            "JOIN p.user u " +
-            "WHERE u.email = :email")
-    List<MyPostDto> findMyPostsByUserEmail(@Param("email") String email);
+    // 이메일 기준으로 엔티티 조회
+    List<SharePost> findByUserEmail(String email);
 }

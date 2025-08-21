@@ -13,11 +13,6 @@ public interface StudyCommentRepository extends JpaRepository<StudyComment, Long
     // postId 기준으로 댓글 시간순 조회
     List<StudyComment> findByPostIdOrderByCreatedAtAsc(Long postId);
 
-    // MyCommentDto에 postId, postTitle 추가
-    @Query("SELECT new com.example.certif.dto.MyCommentDto(" +
-            "c.id, c.content, 'study', c.createdAt, c.updatedAt, c.post.id, c.post.title) " +
-            "FROM StudyComment c " +
-            "JOIN c.user u " +
-            "WHERE u.email = :email")
-    List<MyCommentDto> findMyCommentsByUserEmail(@Param("email") String email);
+    // 이메일 기준으로 엔티티 조회
+    List<StudyComment> findByUserEmail(String email);
 }
