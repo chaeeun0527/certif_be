@@ -14,5 +14,5 @@ public interface StudyPostRepository extends JpaRepository<StudyPost, Long> {
     // 게시글 ID로 조회
     Optional<StudyPost> findById(Long id);
 
-    List<StudyPost> findByUserEmail(String email);
+    List<StudyPost> findByUser_Email(String email);
 }

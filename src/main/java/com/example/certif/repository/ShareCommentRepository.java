@@ -12,5 +12,5 @@ public interface ShareCommentRepository extends JpaRepository<ShareComment, Long
     //게시물 ID로 댓글 목록 조회
     List<ShareComment> findBySharePostId(Long postId);
 
-    List<ShareComment> findByUserEmail(String email);
+    List<ShareComment> findByUser_Email(String email);
 }

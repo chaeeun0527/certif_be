@@ -11,5 +11,5 @@ public interface SharePostRepository extends JpaRepository<SharePost, Long> {
 
     List<SharePost> findByCategoryId(Long categoryId);
 
-    List<SharePost> findByUserEmail(String email);
+    List<SharePost> findByUser_Email(String email);
 }

@@ -10,5 +10,5 @@ public interface StudyCommentRepository extends JpaRepository<StudyComment, Long
     // postId 기준으로 댓글 시간순 조회
     List<StudyComment> findByPostIdOrderByCreatedAtAsc(Long postId);
 
-    List<StudyComment> findByUserEmail(String email);
+    List<StudyComment> findByUser_Email(String email);
 }
