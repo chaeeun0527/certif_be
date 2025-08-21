@@ -79,8 +79,8 @@ public class UserService {
     // 내가 쓴 게시글 목록 조회
     public List<MyPostDto> getMyPosts(String email) {
         List<MyPostDto> result = new ArrayList<>();
-        studyPostRepository.findByUser_Email(email).forEach(p -> result.add(MyPostDto.fromEntity(p, "study")));
-        sharePostRepository.findByUser_Email(email).forEach(p -> result.add(MyPostDto.fromEntity(p, "share")));
+        result.addAll(studyPostRepository.findMyPostsByUserEmail(email));
+        result.addAll(sharePostRepository.findMyPostsByUserEmail(email));
         return result;
     }
 
@@ -137,8 +137,9 @@ public class UserService {
     // 내가 쓴 댓글 목록 조회
     public List<MyCommentDto> getMyComments(String email) {
         List<MyCommentDto> result = new ArrayList<>();
-        studyCommentRepository.findByUser_Email(email).forEach(c -> result.add(MyCommentDto.fromEntity(c, "study")));
-        shareCommentRepository.findByUser_Email(email).forEach(c -> result.add(MyCommentDto.fromEntity(c, "share")));
+
+        result.addAll(studyCommentRepository.findMyCommentsByUserEmail(email));
+        result.addAll(shareCommentRepository.findMyCommentsByUserEmail(email));
         return result;
     }
 
