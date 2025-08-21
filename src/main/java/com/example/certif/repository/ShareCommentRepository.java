@@ -16,9 +16,11 @@ public interface ShareCommentRepository extends JpaRepository<ShareComment, Long
     //게시물 ID로 댓글 목록 조회
     List<ShareComment> findBySharePostId(Long postId);
 
-    @Query("SELECT new com.example.certif.dto.MyCommentDto(p.id, p.content, 'share', p.createdAt, p.updatedAt) " +
-            "FROM ShareComment p " +
-            "JOIN p.user u " +
+    // MyCommentDto에 postId, postTitle 추가
+    @Query("SELECT new com.example.certif.dto.MyCommentDto(" +
+            "c.id, c.content, 'share', c.createdAt, c.updatedAt, c.post.id, c.post.title) " +
+            "FROM ShareComment c " +
+            "JOIN c.user u " +
             "WHERE u.email = :email")
     List<MyCommentDto> findMyCommentsByUserEmail(@Param("email") String email);
 }

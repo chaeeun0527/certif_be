@@ -18,6 +18,10 @@ public class MyCommentDto {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    // 게시글 정보
+    private Long postId;
+    private String postTitle;
+
     // StudyComment 변환
     public static MyCommentDto fromEntity(StudyComment comment, String type) {
         return MyCommentDto.builder()
@@ -26,6 +30,8 @@ public class MyCommentDto {
                 .type(type)
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
+                .postId(comment.getPost().getId())
+                .postTitle(comment.getPost().getTitle())
                 .build();
     }
 
@@ -37,6 +43,8 @@ public class MyCommentDto {
                 .type(type)
                 .createdAt(comment.getCreatedAt())
                 .updatedAt(comment.getUpdatedAt())
+                .postId(comment.getSharePost().getId())
+                .postTitle(comment.getSharePost().getTitle())
                 .build();
     }
 }
