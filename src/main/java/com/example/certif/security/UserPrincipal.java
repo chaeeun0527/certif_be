@@ -12,20 +12,14 @@ public class UserPrincipal implements UserDetails {
     private final String email;
     private final String password;
 
-    public UserPrincipal(User user) {
-        this.id = user.getId();
-        this.email = user.getEmail();
-        this.password = user.getPassword();
-    }
 
-    // JwtAuthenticationFilter에서 사용 가능
     public UserPrincipal(Long id, String email, String password) {
         this.id = id;
         this.email = email;
         this.password = password;
     }
 
-    public Long getId() {
+    public Long getUserId() {
         return id;
     }
 
