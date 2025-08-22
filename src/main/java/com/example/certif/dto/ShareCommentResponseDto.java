@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 
 public class ShareCommentResponseDto {
     private Long id;
+    private Long userId;
     private String content;
     private String nickname;
     private String profileImage;
@@ -24,6 +25,7 @@ public class ShareCommentResponseDto {
     // Entity -> DTO  변환
     public ShareCommentResponseDto(ShareCommentEntity entity){
         this.id = entity.getId();
+        this.userId = entity.getUser().getId();
         this.content = entity.getContent();
         this.nickname = entity.getUser().getNickname();
         this.profileImage = entity.getUser().getProfileImage();
