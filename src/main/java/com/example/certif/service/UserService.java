@@ -35,8 +35,8 @@ public class UserService {
     private final Path baseFolder = Paths.get(System.getProperty("user.home"), "app-data", "profile-images");
 
     // 사용자 정보
-    public User getMyInfo(String email) {
-        return userRepository.findByEmail(email).orElseThrow();
+    public User getMyInfo(Long userId) {
+        return userRepository.findById(userId).orElseThrow();
     }
 
     // 비밀번호 재설정 요청
@@ -77,11 +77,11 @@ public class UserService {
     }
 
     // 내가 쓴 게시글 목록 조회
-    public List<MyPostDto> getMyPosts(String email) {
+    public List<MyPostDto> getMyPosts(Long userId) {
         List<MyPostDto> result = new ArrayList<>();
 
-        List<StudyPost> studyPosts = studyPostRepository.findByUserEmail(email);
-        List<SharePost> sharePosts = sharePostRepository.findByUserEmail(email);
+        List<StudyPost> studyPosts = studyPostRepository.findByUserId(userId);
+        List<SharePost> sharePosts = sharePostRepository.findByUserId(userId);
 
         for (StudyPost post : studyPosts) {
             result.add(MyPostDto.fromEntity(post, "study")); // DTO 변환 시 type 포함
@@ -93,17 +93,17 @@ public class UserService {
     }
 
     // 내가 쓴 특정 게시글 조회
-    public MyPostDto getMyPost(String email, Long postId, String type) throws AccessDeniedException {
+    public MyPostDto getMyPost(Long userId, Long postId, String type) throws AccessDeniedException {
         if ("study".equals(type)) { // 스터디 모집 글
             var post = studyPostRepository.findById(postId)
                     .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-            if (!post.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            if (!post.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
             return MyPostDto.fromEntity(post, "study");
         }
         else if ("share".equals(type)) { // 공유마당 글
             var post = sharePostRepository.findById(postId)
                     .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-            if (!post.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            if (!post.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
             return MyPostDto.fromEntity(post, "share");
         } else throw new IllegalArgumentException("올바른 게시판 타입이 아닙니다.");
     }

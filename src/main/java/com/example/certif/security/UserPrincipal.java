@@ -1,23 +1,24 @@
 package com.example.certif.security;
 
+import com.example.certif.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 
 public class UserPrincipal implements UserDetails {
 
-    private final Long userId;
+    private final Long id;
     private final String email;
     private final String password;
 
-    public UserPrincipal(Long userId, String email, String password) {
-        this.userId = userId;
-        this.email = email;
-        this.password = password;
+    public UserPrincipal(User user) {
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.password = user.getPassword();
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getId() {
+        return id;
     }
 
     @Override

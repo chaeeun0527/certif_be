@@ -23,7 +23,7 @@ public class UserController {
     // 마이페이지
     @GetMapping("/my-page")
     public ResponseEntity<User> getMyPage(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(userService.getMyInfo(principal.getUsername()));
+        return ResponseEntity.ok(userService.getMyInfo(principal.getId()));
         // getUsername()이 email 반환
     }
 
@@ -47,7 +47,7 @@ public class UserController {
     // 내가 쓴 게시글 목록 조회
     @GetMapping("/my-posts")
     public ResponseEntity<List<MyPostDto>> getMyPosts(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(userService.getMyPosts(principal.getUsername()));
+        return ResponseEntity.ok(userService.getMyPosts(principal.getId()));
     }
 
     // 내가 쓴 특정 게시글 조회
@@ -57,7 +57,7 @@ public class UserController {
             @PathVariable Long postId,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        return ResponseEntity.ok(userService.getMyPost(principal.getUsername(), postId, type));
+        return ResponseEntity.ok(userService.getMyPost(principal.getId(), postId, type));
     }
 
     // 내가 쓴 게시글 수정
