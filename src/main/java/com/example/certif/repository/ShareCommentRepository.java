@@ -1,11 +1,7 @@
 package com.example.certif.repository;
 
-import com.example.certif.dto.MyCommentDto;
-import com.example.certif.dto.MyPostDto;
 import com.example.certif.entity.ShareComment;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;

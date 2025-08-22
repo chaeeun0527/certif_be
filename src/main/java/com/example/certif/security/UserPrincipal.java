@@ -4,6 +4,7 @@ import com.example.certif.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
+import java.util.Collections;
 
 public class UserPrincipal implements UserDetails {
 
@@ -24,7 +25,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null; // 필요 시 ROLE 설정
+        return Collections.emptyList(); // 필요 시 ROLE 설정
     }
 
     @Override
