@@ -1,6 +1,5 @@
 package com.example.certif.security;
 
-import com.example.certif.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
