@@ -22,4 +22,6 @@ public class CertificateDetailDto {
     private String qualification;
     private String fee;
     private String features;
+
+    private boolean favorited; // 로그인 사용자 기준 즐겨찾기 여부
 }

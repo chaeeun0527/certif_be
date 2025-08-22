@@ -2,12 +2,10 @@ package com.example.certif.dto;
 
 //게시물 응답 DTO
 
-import com.example.certif.entity.SharePostEntity;
+import com.example.certif.entity.SharePost;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.apache.catalina.LifecycleState;
-import org.springframework.jca.support.LocalConnectionFactoryBean;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,10 +22,10 @@ public class SharePostResponseDto {
     private Long categoryId;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<ShareCommentResponseDto> commnets;
+    private List<ShareCommentResponseDto> comments;
 
     // Entity -> DTO 변환
-    public SharePostResponseDto(SharePostEntity entity){
+    public SharePostResponseDto(SharePost entity){
         this.id = entity.getId();
         this.title = entity.getTitle();
         this.content = entity.getContent();
@@ -35,7 +33,7 @@ public class SharePostResponseDto {
         this.categoryId = entity.getCategory().getId();
         this.createdAt = entity.getCreatedAt();
         this.updatedAt = entity.getUpdatedAt();
-        this.commnets = entity.getComments().stream()
+        this.comments = entity.getComments().stream()
                 .map(ShareCommentResponseDto::new)
                 .collect(Collectors.toList());
 

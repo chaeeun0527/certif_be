@@ -2,12 +2,15 @@ package com.example.certif.controller;
 
 import com.example.certif.dto.*;
 import com.example.certif.entity.User;
+import com.example.certif.security.UserPrincipal;
 import com.example.certif.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
 
 @RestController
@@ -17,72 +20,133 @@ public class UserController {
 
     private final UserService userService;
 
+    // 마이페이지
     @GetMapping("/my-page")
-    public ResponseEntity<User> getMyPage(@RequestParam String email) {
-        return ResponseEntity.ok(userService.getMyInfo(email));
+    public ResponseEntity<User> getMyPage(@AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(userService.getMyInfo(principal.getUsername()));
+        // getUsername()이 email 반환
     }
 
+    // 비밀번호 재설정 요청 메일 보내기
     @PostMapping("/request-password-reset")
-    public ResponseEntity<String> requestPasswordReset(@RequestBody PasswordResetTokenRequest request) {
-        userService.sendPasswordResetToken(request.getEmail());
+    public ResponseEntity<String> requestPasswordReset(
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        String email = principal.getUsername();
+        userService.sendPasswordResetToken(email);
         return ResponseEntity.ok("비밀번호 재설정 이메일 전송 완료");
     }
 
+    // 비밀번호 재설정
     @PostMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody PasswordResetRequest request) {
         userService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok("비밀번호가 성공적으로 재설정되었습니다");
     }
 
-    @GetMapping("/my-comments")
-    public ResponseEntity<List<String>> getMyComments(@RequestParam String email) {
-        return ResponseEntity.ok(userService.getMyComments(email));
-    }
-
-    @PatchMapping("/my-comments/{id}")
-    public ResponseEntity<String> updateComment(@PathVariable Long id, @RequestParam String content) {
-        userService.updateComment(id, content);
-        return ResponseEntity.ok("댓글 수정 완료");
-    }
-
-    @DeleteMapping("/my-comments/{commentId}")
-    public ResponseEntity<String> deleteComment(@PathVariable Long commentId) {
-        userService.deleteComment(commentId);
-        return ResponseEntity.ok("댓글 삭제 완료");
-    }
-
+    // 내가 쓴 게시글 목록 조회
     @GetMapping("/my-posts")
-    public ResponseEntity<List<String>> getMyPosts(@RequestParam String email) {
-        return ResponseEntity.ok(userService.getMyPosts(email));
+    public ResponseEntity<List<MyPostDto>> getMyPosts(@AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(userService.getMyPosts(principal.getUsername()));
     }
 
-    @PatchMapping("/my-posts/{id}")
-    public ResponseEntity<String> updatePost(@PathVariable Long id, @RequestParam String content) {
-        userService.updatePost(id, content);
+    // 내가 쓴 특정 게시글 조회
+    @GetMapping("/my-posts/{type}/{postId}")
+    public ResponseEntity<MyPostDto> getMyPost(
+            @PathVariable String type,
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) throws AccessDeniedException {
+        return ResponseEntity.ok(userService.getMyPost(principal.getUsername(), postId, type));
+    }
+
+    // 내가 쓴 게시글 수정
+    @PatchMapping("/my-posts/{type}/{postId}")
+    public ResponseEntity<String> updatePost(
+            @PathVariable String type,
+            @PathVariable Long postId,
+            @RequestBody String title,
+            @RequestBody String content,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) throws AccessDeniedException {
+        userService.updatePost(postId, title, content, type, principal.getUsername());
         return ResponseEntity.ok("게시글 수정 완료");
     }
 
-    @DeleteMapping("/my-posts/{postId}")
-    public ResponseEntity<String> deletePost(@PathVariable Long postId) {
-        userService.deletePost(postId);
+    // 내가 쓴 게시글 삭제
+    @DeleteMapping("/my-posts/{type}/{postId}")
+    public ResponseEntity<String> deletePost(
+            @PathVariable String type,
+            @PathVariable Long postId,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) throws AccessDeniedException {
+        userService.deletePost(postId, type, principal.getUsername());
         return ResponseEntity.ok("게시글 삭제 완료");
     }
 
+    // 내가 쓴 댓글 목록 조회
+    @GetMapping("/my-comments")
+    public ResponseEntity<List<MyCommentDto>> getMyComments(@AuthenticationPrincipal UserPrincipal principal) {
+        return ResponseEntity.ok(userService.getMyComments(principal.getUsername())); // username = email
+    }
+
+    // 내가 쓴 특정 댓글 조회
+    @GetMapping("/my-comments/{type}/{commentId}")
+    public ResponseEntity<MyCommentDto> getMyComment(
+            @PathVariable String type,
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) throws AccessDeniedException {
+        return ResponseEntity.ok(userService.getMyComment(principal.getUsername(), commentId, type));
+    }
+
+    // 내가 쓴 댓글 수정
+    @PatchMapping("/my-comments/{type}/{commentId}")
+    public ResponseEntity<String> updateComment(
+            @PathVariable String type,
+            @PathVariable Long commentId,
+            @RequestBody String content,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) throws AccessDeniedException {
+        userService.updateComment(commentId, content, type, principal.getUsername());
+        return ResponseEntity.ok("댓글 수정 완료");
+    }
+
+    // 내가 쓴 댓글 삭제
+    @DeleteMapping("/my-comments/{type}/{commentId}")
+    public ResponseEntity<String> deleteComment(
+            @PathVariable String type,
+            @PathVariable Long commentId,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) throws AccessDeniedException {
+        userService.deleteComment(commentId, type, principal.getUsername());
+        return ResponseEntity.ok("댓글 삭제 완료");
+    }
+
+    // 프로필 이미지 업로드
     @PostMapping("/profile-image")
-    public ResponseEntity<String> uploadProfileImage(@RequestParam MultipartFile image, @RequestParam String email) {
-        userService.uploadProfileImage(email, image);
+    public ResponseEntity<String> uploadProfileImage(
+            @RequestParam MultipartFile image,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        userService.uploadProfileImage(principal.getUsername(), image);
         return ResponseEntity.ok("프로필 이미지 업로드 완료");
     }
 
+    // 프로필 이미지 수정
     @PatchMapping("/profile-image")
-    public ResponseEntity<String> updateProfileImage(@RequestParam MultipartFile image, @RequestParam String email) {
-        userService.updateProfileImage(email, image);
+    public ResponseEntity<String> updateProfileImage(
+            @RequestParam MultipartFile image,
+            @AuthenticationPrincipal UserPrincipal principal
+    ) {
+        userService.updateProfileImage(principal.getUsername(), image);
         return ResponseEntity.ok("프로필 이미지 수정 완료");
     }
 
+    // 프로필 이미지 삭제
     @DeleteMapping("/profile-image")
-    public ResponseEntity<String> deleteProfileImage(@RequestParam String email) {
-        userService.deleteProfileImage(email);
+    public ResponseEntity<String> deleteProfileImage(@AuthenticationPrincipal UserPrincipal principal) {
+        userService.deleteProfileImage(principal.getUsername());
         return ResponseEntity.ok("프로필 이미지 삭제 완료");
     }
 }

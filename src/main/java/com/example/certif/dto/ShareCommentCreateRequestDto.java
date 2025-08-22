@@ -1,8 +1,7 @@
 package com.example.certif.dto;
 
-import com.example.certif.entity.Category;
-import com.example.certif.entity.ShareCommentEntity;
-import com.example.certif.entity.SharePostEntity;
+import com.example.certif.entity.ShareComment;
+import com.example.certif.entity.SharePost;
 import com.example.certif.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
@@ -17,8 +16,8 @@ public class ShareCommentCreateRequestDto {
     private String content;
 
     //DTO -> Entity 변환
-    public ShareCommentEntity toEntity(User user, SharePostEntity sharePost){
-        return ShareCommentEntity.builder()
+    public ShareComment toEntity(User user, SharePost sharePost){
+        return ShareComment.builder()
                 .content(this.content)
                 .user(user)
                 .sharePost(sharePost)

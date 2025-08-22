@@ -42,11 +42,6 @@ public class StudyComment {
     private User user;
 
     public static StudyComment createComment(StudyCommentDto dto, StudyPost studyPost, User user) {
-        if(dto.getCommentId() != null)
-            throw new IllegalArgumentException("댓글 생성 실패! 댓글의 id가 없어야 합니다.");
-        if(dto.getPostId() != studyPost.getId())
-            throw new IllegalArgumentException("댓글 생성 실패! 게시글의 id가 잘못됐습니다");
-
         return new StudyComment(
                 null,               // id는 null로 둔 채로 생성하기
                 dto.getContent(),   // content
@@ -58,14 +53,11 @@ public class StudyComment {
     }
 
     public void patch(StudyCommentDto dto) {
-        // 예외 발생
-        if(this.id != dto.getPostId())
-            throw new IllegalArgumentException("댓글 수정 실패! 잘못된 id가 입력됐습니다.");
-        // 객체의 갱신 - 댓글 본문 내용 갱신
-        if(dto.getContent() != null)
-            this.content = dto.getContent(); // this가 target 즉, 바뀜 당해야 하는 기존 내용
-
+        if (dto.getContent() != null && !dto.getContent().isEmpty()) {
+            this.content = dto.getContent();
+        }
     }
+
 }
 
 

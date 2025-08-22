@@ -1,7 +1,6 @@
 package com.example.certif.dto;
 
-import com.example.certif.entity.ShareCommentEntity;
-import jakarta.validation.constraints.NotBlank;
+import com.example.certif.entity.ShareComment;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -14,6 +13,7 @@ import java.time.LocalDateTime;
 
 public class ShareCommentResponseDto {
     private Long id;
+    private Long userId;
     private String content;
     private String nickname;
     private String profileImage;
@@ -22,8 +22,9 @@ public class ShareCommentResponseDto {
     private LocalDateTime updatedAt;
 
     // Entity -> DTO  변환
-    public ShareCommentResponseDto(ShareCommentEntity entity){
+    public ShareCommentResponseDto(ShareComment entity){
         this.id = entity.getId();
+        this.userId = entity.getUser().getId();
         this.content = entity.getContent();
         this.nickname = entity.getUser().getNickname();
         this.profileImage = entity.getUser().getProfileImage();

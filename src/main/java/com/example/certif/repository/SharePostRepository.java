@@ -1,17 +1,19 @@
 package com.example.certif.repository;
 
-import com.example.certif.entity.SharePostEntity;
+import com.example.certif.dto.MyPostDto;
+import com.example.certif.entity.SharePost;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.RequestBody;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Repository
-public interface SharePostRepository extends JpaRepository<SharePostEntity, Long> {
+public interface SharePostRepository extends JpaRepository<SharePost, Long> {
 
-    List<SharePostEntity> findByCategoryId(Long categoryId);
+    List<SharePost> findByCategoryId(Long categoryId);
 
+    // 이메일 기준으로 엔티티 조회
+    List<SharePost> findByUserEmail(String email);
 }

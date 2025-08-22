@@ -1,12 +1,13 @@
 package com.example.certif.controller;
 
 import com.example.certif.dto.FavoriteCertificateDto;
+import com.example.certif.security.UserPrincipal;
 import com.example.certif.service.FavoriteService;
-import com.example.certif.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,16 +19,13 @@ import java.util.List;
 public class FavoriteController {
 
     private final FavoriteService favoriteService;
-    private final JwtUtil jwtUtil;
 
     // 1. 사용자의 즐겨찾기 자격증 목록 조회
     @GetMapping
     public ResponseEntity<List<FavoriteCertificateDto>> getFavorites(
-            @RequestHeader("Authorization") String authHeader
+            @AuthenticationPrincipal UserPrincipal principal
     ){
-        // "Bearer" 제거
-        String token = authHeader.replace("Bearer ", "");
-        Long userId = jwtUtil.getUserIdFromToken(token);
+        Long userId = principal.getUserId();
 
         List<FavoriteCertificateDto> dtos = favoriteService.getFavoritesByUser(userId);
         return ResponseEntity.status(HttpStatus.OK).body(dtos);
@@ -38,13 +36,10 @@ public class FavoriteController {
     // 2. 자격증을 즐겨찾기에 등록
     @PostMapping("/{certificateId}")
     public ResponseEntity<String> addFavorite(
-            @RequestParam Long certificateId,
-            @RequestHeader("Authorization") String authHeader
+            @PathVariable Long certificateId,
+            @AuthenticationPrincipal UserPrincipal principal
     ) {
-        // "Bearer" 제거
-        String token = authHeader.replace("Bearer ", "");
-        Long userId = jwtUtil.getUserIdFromToken(token);
-
+        Long userId = principal.getUserId();
         favoriteService.addFavorite(userId, certificateId);
         return ResponseEntity.status(HttpStatus.OK).body("즐겨찾기에 추가되었습니다.");
     }
@@ -52,13 +47,10 @@ public class FavoriteController {
     // 3. 자격증을 즐겨찾기에서 해제
     @DeleteMapping("/{certificateId}")
     public ResponseEntity<String> removeFavorite(
-            @RequestParam Long certificateId,
-            @RequestHeader("Authorization") String authHeader
+            @PathVariable Long certificateId,
+            @AuthenticationPrincipal UserPrincipal principal
     ){
-        // "Bearer" 제거
-        String token = authHeader.replace("Bearer ", "");
-        Long userId = jwtUtil.getUserIdFromToken(token);
-
+        Long userId = principal.getUserId();
         favoriteService.removeFavorite(userId, certificateId);
         return ResponseEntity.status(HttpStatus.OK).body("즐겨찾기가 해제되었습니다.");
 
