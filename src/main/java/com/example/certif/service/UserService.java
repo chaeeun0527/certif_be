@@ -1,18 +1,21 @@
 package com.example.certif.service;
 
-import com.example.certif.entity.User;
-import com.example.certif.repository.CommentRepository;
-import com.example.certif.repository.PostRepository;
-import com.example.certif.repository.UserRepository;
+import com.example.certif.dto.MyCommentDto;
+import com.example.certif.dto.MyPostDto;
+import com.example.certif.entity.*;
+import com.example.certif.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,13 +24,17 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final CommentRepository commentRepository;
-    private final PostRepository postRepository;
+    private final StudyPostRepository studyPostRepository;
+    private final SharePostRepository sharePostRepository;
+    private final StudyCommentRepository studyCommentRepository;
+    private final ShareCommentRepository shareCommentRepository;
+
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    // 프로필 이미지 저장 기본 폴더 (서버 배포 환경에서도 사용 가능)
+    // 프로필 이미지 저장 기본 폴더
     private final Path baseFolder = Paths.get(System.getProperty("user.home"), "app-data", "profile-images");
 
+    // 사용자 정보
     public User getMyInfo(String email) {
         return userRepository.findByEmail(email).orElseThrow();
     }
@@ -47,7 +54,6 @@ public class UserService {
         System.out.println("=== 비밀번호 재설정 이메일 ===");
         System.out.println("수신자: " + email);
         System.out.println("토큰: " + token);
-        System.out.println("재설정 링크: http://localhost:8080/reset-password?token=" + token);
         System.out.println("============================");
     }
 
@@ -70,37 +76,132 @@ public class UserService {
         userRepository.save(user);
     }
 
+    // 내가 쓴 게시글 목록 조회
+    public List<MyPostDto> getMyPosts(String email) {
+        List<MyPostDto> result = new ArrayList<>();
 
-    public List<String> getMyComments(String email) {
-        return commentRepository.findByUserEmail(email).stream()
-                .map(comment -> comment.getContent()) // 또는 dto로 변환
-                .toList();
+        List<StudyPost> studyPosts = studyPostRepository.findByUserEmail(email);
+        List<SharePost> sharePosts = sharePostRepository.findByUserEmail(email);
+
+        for (StudyPost post : studyPosts) {
+            result.add(MyPostDto.fromEntity(post, "study")); // DTO 변환 시 type 포함
+        }
+        for (SharePost post : sharePosts) {
+            result.add(MyPostDto.fromEntity(post, "share"));
+        }
+        return result;
     }
 
-    public void updateComment(Long id, String content) {
-        var comment = commentRepository.findById(id).orElseThrow();
-        comment.setContent(content);
-        commentRepository.save(comment);
+    // 내가 쓴 특정 게시글 조회
+    public MyPostDto getMyPost(String email, Long postId, String type) throws AccessDeniedException {
+        if ("study".equals(type)) { // 스터디 모집 글
+            var post = studyPostRepository.findById(postId)
+                    .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+            if (!post.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            return MyPostDto.fromEntity(post, "study");
+        }
+        else if ("share".equals(type)) { // 공유마당 글
+            var post = sharePostRepository.findById(postId)
+                    .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+            if (!post.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            return MyPostDto.fromEntity(post, "share");
+        } else throw new IllegalArgumentException("올바른 게시판 타입이 아닙니다.");
     }
 
-    public void deleteComment(Long commentId) {
-        commentRepository.deleteById(commentId);
+    // 내가 쓴 게시글 수정
+    @Transactional
+    public void updatePost(Long postId, String title, String content, String type, String email) throws AccessDeniedException {
+        if ("study".equals(type)) {
+            var post = studyPostRepository.findById(postId).orElseThrow();
+            if (!post.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            post.setTitle(title);
+            post.setContent(content);
+            studyPostRepository.save(post);
+        }
+        else if ("share".equals(type)) {
+            var post = sharePostRepository.findById(postId).orElseThrow();
+            if (!post.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            post.setTitle(title);
+            post.setContent(content);
+            sharePostRepository.save(post);
+        } else throw new IllegalArgumentException("올바른 게시판 타입이 아닙니다.");
     }
 
-    public List<String> getMyPosts(String email) {
-        return postRepository.findByUserEmail(email).stream()
-                .map(post -> post.getTitle()) // 또는 dto로 변환
-                .toList();
+    // 내가 쓴 게시글 삭제
+    @Transactional
+    public void deletePost(Long postId, String type, String email) throws AccessDeniedException {
+        if ("study".equals(type)) {
+            var post = studyPostRepository.findById(postId).orElseThrow();
+            if (!post.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            studyPostRepository.delete(post);
+        }
+        else if ("share".equals(type)) {
+            var post = sharePostRepository.findById(postId).orElseThrow();
+            if (!post.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            sharePostRepository.delete(post);
+        } else throw new IllegalArgumentException("올바른 게시판 타입이 아닙니다.");
     }
 
-    public void updatePost(Long id, String content) {
-        var post = postRepository.findById(id).orElseThrow();
-        post.setContent(content);
-        postRepository.save(post);
+    // 내가 쓴 댓글 목록 조회
+    public List<MyCommentDto> getMyComments(String email) {
+        List<MyCommentDto> result = new ArrayList<>();
+
+        List<StudyComment> studyComments = studyCommentRepository.findByUserEmail(email);
+        List<ShareComment> shareComments = shareCommentRepository.findByUserEmail(email);
+
+        for (StudyComment comment : studyComments) {
+            result.add(MyCommentDto.fromEntity(comment, "study")); // DTO 변환 시 postId, postTitle 포함
+        }
+        for (ShareComment comment : shareComments) {
+            result.add(MyCommentDto.fromEntity(comment, "share"));
+        }
+        return result;
     }
 
-    public void deletePost(Long postId) {
-        postRepository.deleteById(postId);
+    // 내가 쓴 특정 댓글 조회
+    public MyCommentDto getMyComment(String email, Long commentId, String type) throws AccessDeniedException {
+        if ("study".equals(type)) {
+            var comment = studyCommentRepository.findById(commentId).orElseThrow();
+            if (!comment.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            return MyCommentDto.fromEntity(comment, "study");
+        }
+        else if ("share".equals(type)) {
+            var comment = shareCommentRepository.findById(commentId).orElseThrow();
+            if (!comment.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            return MyCommentDto.fromEntity(comment, "share");
+        } else throw new IllegalArgumentException("올바른 댓글 타입이 아닙니다.");
+    }
+
+    // 내가 쓴 댓글 수정
+    @Transactional
+    public void updateComment(Long commentId, String content, String type, String email) throws AccessDeniedException {
+        if ("study".equals(type)) {
+            var comment = studyCommentRepository.findById(commentId).orElseThrow();
+            if (!comment.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            comment.setContent(content);
+            studyCommentRepository.save(comment);
+        }
+        else if ("share".equals(type)) {
+            var comment = shareCommentRepository.findById(commentId).orElseThrow();
+            if (!comment.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            comment.setContent(content);
+            shareCommentRepository.save(comment);
+        } else throw new IllegalArgumentException("올바른 댓글 타입이 아닙니다.");
+    }
+
+    // 내가 쓴 댓글 삭제
+    @Transactional
+    public void deleteComment(Long commentId, String type, String email) throws AccessDeniedException {
+        if ("study".equals(type)) {
+            var comment = studyCommentRepository.findById(commentId).orElseThrow();
+            if (!comment.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            studyCommentRepository.delete(comment);
+        }
+        else if ("share".equals(type)) {
+            var comment = shareCommentRepository.findById(commentId).orElseThrow();
+            if (!comment.getUser().getEmail().equals(email)) throw new AccessDeniedException("권한 없음");
+            shareCommentRepository.delete(comment);
+        } else throw new IllegalArgumentException("올바른 댓글 타입이 아닙니다.");
     }
 
     // 프로필 이미지 업로드
