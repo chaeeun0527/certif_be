@@ -43,7 +43,7 @@ public class StudyComment {
 
     public static StudyComment createComment(StudyCommentDto dto, StudyPost studyPost, User user) {
         return new StudyComment(
-                null,               // id는 null로 둬서 DB에서 생성
+                null,               // id는 null로 둔 채로 생성하기
                 dto.getContent(),   // content
                 null,               // createdAt 자동생성 -> null 전달
                 null,               // updatedAt 자동생성 -> null 전달
@@ -57,6 +57,7 @@ public class StudyComment {
             this.content = dto.getContent();
         }
     }
+
 }
 
 

@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/study")
 @RequiredArgsConstructor
 public class StudyPostController {
     private final JwtUtil jwtUtil;
@@ -26,31 +25,39 @@ public class StudyPostController {
     private StudyPostService studyPostService;
 
     // 1-1. 스터디 게시판 전체 글 조회 by 카테고리에서 기본 화면 (카테고리 번호=1)
-    @GetMapping("/default")
+    @GetMapping("/api/study/default")
     public ResponseEntity<List<StudyPostResponseDto>> defaultposts() {
         List<StudyPostResponseDto> dtos = studyPostService.getDefaultCategoryPosts();
         return ResponseEntity.status(HttpStatus.OK).body(dtos);
     }
 
     // 1-2. 스터디 게시판 전체 글 조회 by 카테고리
-    @GetMapping("/category/{categoryId}")
+    @GetMapping("/api/study/category/{categoryId}")
     public ResponseEntity<List<StudyPostResponseDto>> posts(@PathVariable Long categoryId){
         List<StudyPostResponseDto> dtos = studyPostService.getPostsByCategory(categoryId);
         return ResponseEntity.status(HttpStatus.OK).body(dtos);
     }
 
     // 1-3. 특정 스터디 게시판 글 조회
-    @GetMapping("/{postId}")
+    @GetMapping("/api/study/{postId}")
     public ResponseEntity<StudyPostResponseDto> getPost(@PathVariable Long postId) {
         StudyPostResponseDto dto = studyPostService.findById(postId);
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
 
     //  2. 스터디 게시판 글 생성
+<<<<<<< HEAD
+    @PostMapping("/api/study")
+    public ResponseEntity<StudyPostResponseDto> create(@RequestBody StudyPostCreateDto dto,
+                                                       @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+=======
     @PostMapping
     public ResponseEntity<StudyPostResponseDto> create(
             @RequestBody StudyPostCreateDto dto,
             @AuthenticationPrincipal UserPrincipal principal) {
+>>>>>>> 09f47cd27d26595f191ea0de7d9c3d6ae7b6f214
 
         Long userId = principal.getUserId();
         StudyPostResponseDto createdDto = studyPostService.create(dto, userId);
@@ -58,11 +65,20 @@ public class StudyPostController {
     }
 
     // 3. 스터디 게시판 글 수정
+<<<<<<< HEAD
+    @PatchMapping("/api/study/{postId}")
+    public ResponseEntity<StudyPostResponseDto> update(@PathVariable Long postId,
+                                                       @RequestBody StudyPostUpdateDto dto,
+                                                       @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+=======
     @PatchMapping("/{postId}")
     public ResponseEntity<StudyPostResponseDto> update(
             @PathVariable Long postId,
             @RequestBody StudyPostUpdateDto dto,
             @AuthenticationPrincipal UserPrincipal principal) {
+>>>>>>> 09f47cd27d26595f191ea0de7d9c3d6ae7b6f214
 
         Long userId = principal.getUserId();
         StudyPostResponseDto updatedDto = studyPostService.update(postId, dto, userId);
@@ -70,10 +86,18 @@ public class StudyPostController {
     }
 
     // 4. 스터디 게시판 글 삭제
+<<<<<<< HEAD
+    @DeleteMapping("/api/study/{postId}")
+    public ResponseEntity<Void> deletePost(@PathVariable Long postId,
+                                           @RequestHeader("Authorization") String authHeader){
+        String token = authHeader.replace("Bearer ", "");
+        Long userId = jwtUtil.getUserIdFromToken(token);
+=======
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePost(
             @PathVariable Long postId,
             @AuthenticationPrincipal UserPrincipal principal) {
+>>>>>>> 09f47cd27d26595f191ea0de7d9c3d6ae7b6f214
 
         Long userId = principal.getUserId();
         studyPostService.delete(postId, userId); // 작성자 확인 포함

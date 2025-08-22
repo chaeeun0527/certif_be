@@ -71,7 +71,7 @@ public class StudyCommentService {
                         "대상 댓글이 없습니다."));
         // 2. 권한 체크
         if (!target.getUser().getId().equals(userId)) {
-            throw new SecurityException("댓글 수정 권한이 없습니다.");
+            throw new SecurityException("사용자에게 댓글 수정 권한이 없습니다.");
         }
         // 3. 댓글 수정
         target.patch(dto);

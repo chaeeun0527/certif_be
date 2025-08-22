@@ -18,6 +18,7 @@ public class StudyCommentDto {
     private String nickname;
     private String content;
     private LocalDateTime createdAt;
+    private String profileImage;
 
     public static StudyCommentDto createStudyCommentDto(StudyComment studyComment) {
         return new StudyCommentDto(
@@ -26,7 +27,8 @@ public class StudyCommentDto {
                 studyComment.getPost().getId(),
                 studyComment.getUser().getNickname(),
                 studyComment.getContent(),
-                studyComment.getCreatedAt()
+                studyComment.getCreatedAt(),
+                studyComment.getUser().getProfileImage()
         );
     }
 }

@@ -65,7 +65,7 @@ public class StudyPostService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다. userId=" + userId));
         Category category = categoryRepository.findById(dto.getCategoryId())
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 카테고리"));
+                .orElseThrow(() -> new RuntimeException("존재하지 않는 카테고리입니다."));
 
         StudyPost studypost = StudyPost.createStudyPost(dto, user, category);
         StudyPost created = studyPostRepository.save(studypost);
@@ -78,9 +78,9 @@ public class StudyPostService {
     public StudyPostResponseDto update(Long postId, StudyPostUpdateDto dto, Long userId) {
 
         StudyPost target = studyPostRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("스터디 게시판 글 수정 실패! 대상 게시판 글이 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("스터디 게시판 글 수정 실패! 게시판 글 대상이 없습니다."));
         if (!target.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("수정 권한이 없습니다.");
+            throw new AccessDeniedException("사용자에게 수정 권한이 없습니다.");
         }
 
         target.patch(dto);
@@ -93,10 +93,10 @@ public class StudyPostService {
     public void delete(Long postId, Long userId) {
 
         StudyPost target = studyPostRepository.findById(postId)
-                .orElseThrow(() -> new IllegalArgumentException("게시판 글 삭제 실패! 대상이 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("게시판 글 삭제 실패! 게시판 글 대상이 없습니다."));
 
         if (!target.getUser().getId().equals(userId)) {
-            throw new AccessDeniedException("삭제 권한이 없습니다.");
+            throw new AccessDeniedException("사용자에게 삭제 권한이 없습니다.");
         }
 
         studyPostRepository.delete(target);
