@@ -69,7 +69,7 @@ public class UserController {
             @RequestBody String content,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        userService.updatePost(postId, title, content, type, principal.getUsername());
+        userService.updatePost(postId, title, content, type, principal.getId());
         return ResponseEntity.ok("게시글 수정 완료");
     }
 
@@ -80,14 +80,14 @@ public class UserController {
             @PathVariable Long postId,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        userService.deletePost(postId, type, principal.getUsername());
+        userService.deletePost(postId, type, principal.getId());
         return ResponseEntity.ok("게시글 삭제 완료");
     }
 
     // 내가 쓴 댓글 목록 조회
     @GetMapping("/my-comments")
     public ResponseEntity<List<MyCommentDto>> getMyComments(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(userService.getMyComments(principal.getUsername())); // username = email
+        return ResponseEntity.ok(userService.getMyComments(principal.getId())); // username = email
     }
 
     // 내가 쓴 특정 댓글 조회
@@ -97,7 +97,7 @@ public class UserController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        return ResponseEntity.ok(userService.getMyComment(principal.getUsername(), commentId, type));
+        return ResponseEntity.ok(userService.getMyComment(principal.getId(), commentId, type));
     }
 
     // 내가 쓴 댓글 수정
@@ -108,7 +108,7 @@ public class UserController {
             @RequestBody String content,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        userService.updateComment(commentId, content, type, principal.getUsername());
+        userService.updateComment(commentId, content, type, principal.getId());
         return ResponseEntity.ok("댓글 수정 완료");
     }
 
@@ -119,7 +119,7 @@ public class UserController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        userService.deleteComment(commentId, type, principal.getUsername());
+        userService.deleteComment(commentId, type, principal.getId());
         return ResponseEntity.ok("댓글 삭제 완료");
     }
 
