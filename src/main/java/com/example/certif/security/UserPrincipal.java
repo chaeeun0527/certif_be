@@ -1,5 +1,6 @@
 package com.example.certif.security;
 
+import com.example.certif.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
@@ -11,6 +12,12 @@ public class UserPrincipal implements UserDetails {
     private final String email;
     private final String password;
 
+
+    public UserPrincipal(User user) {
+        this.id = user.getId();
+        this.email = user.getEmail();
+        this.password = user.getPassword();
+    }
 
     public UserPrincipal(Long id, String email, String password) {
         this.id = id;
