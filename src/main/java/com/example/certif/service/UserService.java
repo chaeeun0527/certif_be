@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -78,130 +79,180 @@ public class UserService {
 
     // 내가 쓴 게시글 목록 조회
     public List<MyPostDto> getMyPosts(Long userId) {
+        // 스터디 글
+        List<MyPostDto> studyDtos = studyPostRepository.findByUserId(userId).stream()
+                .map(post -> MyPostDto.fromEntity(post, "study"))
+                .toList();
+
+        // 공유 글
+        List<MyPostDto> shareDtos = sharePostRepository.findByUserId(userId).stream()
+                .map(post -> MyPostDto.fromEntity(post, "share"))
+                .toList();
+
+        // 합치기
         List<MyPostDto> result = new ArrayList<>();
+        result.addAll(studyDtos);
+        result.addAll(shareDtos);
 
-        List<StudyPost> studyPosts = studyPostRepository.findByUserId(userId);
-        List<SharePost> sharePosts = sharePostRepository.findByUserId(userId);
-
-        for (StudyPost post : studyPosts) {
-            result.add(MyPostDto.fromEntity(post, "study")); // DTO 변환 시 type 포함
-        }
-        for (SharePost post : sharePosts) {
-            result.add(MyPostDto.fromEntity(post, "share"));
-        }
         return result;
+    }
+
+    // 공통 소유자 검증 메서드
+    private void validateOwnership(Long ownerId, Long userId) throws AccessDeniedException {
+        if (!ownerId.equals(userId)) {
+            throw new AccessDeniedException("권한 없음");
+        }
     }
 
     // 내가 쓴 특정 게시글 조회
     public MyPostDto getMyPost(Long userId, Long postId, String type) throws AccessDeniedException {
-        if ("study".equals(type)) { // 스터디 모집 글
-            var post = studyPostRepository.findById(postId)
+        if ("study".equals(type)) {
+            StudyPost post = studyPostRepository.findById(postId)
                     .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-            if (!post.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
+            validateOwnership(post.getUser().getId(), userId);
             return MyPostDto.fromEntity(post, "study");
-        }
-        else if ("share".equals(type)) { // 공유마당 글
-            var post = sharePostRepository.findById(postId)
+        } else if ("share".equals(type)) {
+            SharePost post = sharePostRepository.findById(postId)
                     .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-            if (!post.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
+            validateOwnership(post.getUser().getId(), userId);
             return MyPostDto.fromEntity(post, "share");
-        } else throw new IllegalArgumentException("올바른 게시판 타입이 아닙니다.");
+        }
+        throw new IllegalArgumentException("올바른 게시판 타입이 아닙니다.");
     }
 
     // 내가 쓴 게시글 수정
     @Transactional
-    public void updatePost(Long postId, String title, String content, String type, Long userId) throws AccessDeniedException {
+    public MyPostDto updatePost(Long postId, String title, String content, String type, Long userId) throws AccessDeniedException {
         if ("study".equals(type)) {
-            var post = studyPostRepository.findById(postId).orElseThrow();
-            if (!post.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
-            post.setTitle(title);
-            post.setContent(content);
-            studyPostRepository.save(post);
+            StudyPost target = studyPostRepository.findById(postId)
+                    .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다: " + postId));
+
+            validateOwnership(target.getUser().getId(), userId);
+
+            target.setTitle(title);
+            target.setContent(content);
+            StudyPost updatedPost = studyPostRepository.save(target);
+            return MyPostDto.fromEntity(updatedPost, "study");
+
+        } else if ("share".equals(type)) {
+            SharePost target = sharePostRepository.findById(postId)
+                    .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다: " + postId));
+
+            validateOwnership(target.getUser().getId(), userId);
+
+            target.setTitle(title);
+            target.setContent(content);
+            SharePost updatedPost = sharePostRepository.save(target);
+            return MyPostDto.fromEntity(updatedPost, "share");
+
+        } else {
+            throw new IllegalArgumentException("올바른 게시판 타입이 아닙니다.");
         }
-        else if ("share".equals(type)) {
-            var post = sharePostRepository.findById(postId).orElseThrow();
-            if (!post.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
-            post.setTitle(title);
-            post.setContent(content);
-            sharePostRepository.save(post);
-        } else throw new IllegalArgumentException("올바른 게시판 타입이 아닙니다.");
     }
+
 
     // 내가 쓴 게시글 삭제
     @Transactional
     public void deletePost(Long postId, String type, Long userId) throws AccessDeniedException {
         if ("study".equals(type)) {
-            var post = studyPostRepository.findById(postId).orElseThrow();
-            if (!post.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
-            studyPostRepository.delete(post);
+            StudyPost target = studyPostRepository.findById(postId)
+                    .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다: " + postId));
+
+            validateOwnership(target.getUser().getId(), userId);
+            studyPostRepository.delete(target);
+
+        } else if ("share".equals(type)) {
+            SharePost target = sharePostRepository.findById(postId)
+                    .orElseThrow(() -> new IllegalArgumentException("게시물을 찾을 수 없습니다: " + postId));
+
+            validateOwnership(target.getUser().getId(), userId);
+            sharePostRepository.delete(target);
+
+        } else {
+            throw new IllegalArgumentException("올바른 게시판 타입이 아닙니다.");
         }
-        else if ("share".equals(type)) {
-            var post = sharePostRepository.findById(postId).orElseThrow();
-            if (!post.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
-            sharePostRepository.delete(post);
-        } else throw new IllegalArgumentException("올바른 게시판 타입이 아닙니다.");
     }
 
     // 내가 쓴 댓글 목록 조회
     public List<MyCommentDto> getMyComments(Long userId) {
+        List<MyCommentDto> studyDtos = studyCommentRepository.findByUserId(userId).stream()
+                .map(comment -> MyCommentDto.fromEntity(comment, "study"))
+                .toList();
+
+        List<MyCommentDto> shareDtos = shareCommentRepository.findByUserId(userId).stream()
+                .map(comment -> MyCommentDto.fromEntity(comment, "share"))
+                .toList();
+
         List<MyCommentDto> result = new ArrayList<>();
+        result.addAll(studyDtos);
+        result.addAll(shareDtos);
 
-        List<StudyComment> studyComments = studyCommentRepository.findByUserId(userId);
-        List<ShareComment> shareComments = shareCommentRepository.findByUserId(userId);
-
-        for (StudyComment comment : studyComments) {
-            result.add(MyCommentDto.fromEntity(comment, "study")); // DTO 변환 시 postId, postTitle 포함
-        }
-        for (ShareComment comment : shareComments) {
-            result.add(MyCommentDto.fromEntity(comment, "share"));
-        }
         return result;
     }
+
 
     // 내가 쓴 특정 댓글 조회
     public MyCommentDto getMyComment(Long userId, Long commentId, String type) throws AccessDeniedException {
         if ("study".equals(type)) {
-            var comment = studyCommentRepository.findById(commentId).orElseThrow();
-            if (!comment.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
+            StudyComment comment = studyCommentRepository.findById(commentId)
+                    .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+            validateOwnership(comment.getUser().getId(), userId);
             return MyCommentDto.fromEntity(comment, "study");
-        }
-        else if ("share".equals(type)) {
-            var comment = shareCommentRepository.findById(commentId).orElseThrow();
-            if (!comment.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
+        } else if ("share".equals(type)) {
+            ShareComment comment = shareCommentRepository.findById(commentId)
+                    .orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+            validateOwnership(comment.getUser().getId(), userId);
             return MyCommentDto.fromEntity(comment, "share");
-        } else throw new IllegalArgumentException("올바른 댓글 타입이 아닙니다.");
+        }
+        throw new IllegalArgumentException("올바른 댓글 타입이 아닙니다.");
     }
 
     // 내가 쓴 댓글 수정
     @Transactional
-    public void updateComment(Long commentId, String content, String type, Long userId) throws AccessDeniedException {
+    public MyCommentDto updateComment(Long commentId, String content, String type, Long userId) throws AccessDeniedException {
         if ("study".equals(type)) {
-            var comment = studyCommentRepository.findById(commentId).orElseThrow();
-            if (!comment.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
-            comment.setContent(content);
-            studyCommentRepository.save(comment);
+            StudyComment target = studyCommentRepository.findById(commentId)
+                    .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다: " + commentId));
+
+            validateOwnership(target.getUser().getId(), userId);
+            target.setContent(content);
+            StudyComment updatedComment = studyCommentRepository.save(target);
+            return MyCommentDto.fromEntity(updatedComment, "study");
+
+        } else if ("share".equals(type)) {
+            ShareComment target = shareCommentRepository.findById(commentId)
+                    .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다: " + commentId));
+
+            validateOwnership(target.getUser().getId(), userId);
+            target.setContent(content);
+            ShareComment updatedComment = shareCommentRepository.save(target);
+            return MyCommentDto.fromEntity(updatedComment, "share");
+
+        } else {
+            throw new IllegalArgumentException("올바른 댓글 타입이 아닙니다.");
         }
-        else if ("share".equals(type)) {
-            var comment = shareCommentRepository.findById(commentId).orElseThrow();
-            if (!comment.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
-            comment.setContent(content);
-            shareCommentRepository.save(comment);
-        } else throw new IllegalArgumentException("올바른 댓글 타입이 아닙니다.");
     }
 
     // 내가 쓴 댓글 삭제
     @Transactional
     public void deleteComment(Long commentId, String type, Long userId) throws AccessDeniedException {
         if ("study".equals(type)) {
-            var comment = studyCommentRepository.findById(commentId).orElseThrow();
-            if (!comment.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
-            studyCommentRepository.delete(comment);
+            StudyComment target = studyCommentRepository.findById(commentId)
+                    .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다: " + commentId));
+
+            validateOwnership(target.getUser().getId(), userId);
+            studyCommentRepository.delete(target);
+
+        } else if ("share".equals(type)) {
+            ShareComment target = shareCommentRepository.findById(commentId)
+                    .orElseThrow(() -> new IllegalArgumentException("댓글을 찾을 수 없습니다: " + commentId));
+
+            validateOwnership(target.getUser().getId(), userId);
+            shareCommentRepository.delete(target);
+
+        } else {
+            throw new IllegalArgumentException("올바른 댓글 타입이 아닙니다.");
         }
-        else if ("share".equals(type)) {
-            var comment = shareCommentRepository.findById(commentId).orElseThrow();
-            if (!comment.getUser().getId().equals(userId)) throw new AccessDeniedException("권한 없음");
-            shareCommentRepository.delete(comment);
-        } else throw new IllegalArgumentException("올바른 댓글 타입이 아닙니다.");
     }
 
     // 프로필 이미지 업로드

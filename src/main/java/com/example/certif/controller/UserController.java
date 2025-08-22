@@ -62,15 +62,15 @@ public class UserController {
 
     // 내가 쓴 게시글 수정
     @PatchMapping("/my-posts/{type}/{postId}")
-    public ResponseEntity<String> updatePost(
+    public ResponseEntity<MyPostDto> updatePost(
             @PathVariable String type,
             @PathVariable Long postId,
             @RequestBody String title,
             @RequestBody String content,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        userService.updatePost(postId, title, content, type, principal.getUserId());
-        return ResponseEntity.ok("게시글 수정 완료");
+        MyPostDto dto = userService.updatePost(postId, title, content, type, principal.getUserId());
+        return ResponseEntity.ok(dto);
     }
 
     // 내가 쓴 게시글 삭제
@@ -102,14 +102,14 @@ public class UserController {
 
     // 내가 쓴 댓글 수정
     @PatchMapping("/my-comments/{type}/{commentId}")
-    public ResponseEntity<String> updateComment(
+    public ResponseEntity<MyCommentDto> updateComment(
             @PathVariable String type,
             @PathVariable Long commentId,
             @RequestBody String content,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        userService.updateComment(commentId, content, type, principal.getUserId());
-        return ResponseEntity.ok("댓글 수정 완료");
+        MyCommentDto dto = userService.updateComment(commentId, content, type, principal.getUserId());
+        return ResponseEntity.ok(dto);
     }
 
     // 내가 쓴 댓글 삭제
