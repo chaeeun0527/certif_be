@@ -87,7 +87,7 @@ public class UserController {
     // 내가 쓴 댓글 목록 조회
     @GetMapping("/my-comments")
     public ResponseEntity<List<MyCommentDto>> getMyComments(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(userService.getMyComments(principal.getUserId())); // username = email
+        return ResponseEntity.ok(userService.getMyComments(principal.getUser())); // username = email
     }
 
     // 내가 쓴 특정 댓글 조회

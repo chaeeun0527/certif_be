@@ -8,25 +8,33 @@ import java.util.Collections;
 
 public class UserPrincipal implements UserDetails {
 
+
     private final Long id;
     private final String email;
     private final String password;
+    private final User user;
 
-
+    // User 엔티티로 생성할 때
     public UserPrincipal(User user) {
         this.id = user.getId();
         this.email = user.getEmail();
         this.password = user.getPassword();
+        this.user = user;
     }
 
     public UserPrincipal(Long id, String email, String password) {
         this.id = id;
         this.email = email;
         this.password = password;
+        this.user = null; // 엔티티는 없을 수도 있음
+    }
+
+    public User getUser() {
+        return user;
     }
 
     public Long getUserId() {
-        return id;
+        return user.getId();
     }
 
     @Override

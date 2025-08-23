@@ -178,12 +178,12 @@ public class UserService {
     // 댓글 관련 서비스
     // 내가 쓴 댓글 목록 조회
     @Transactional
-    public List<MyCommentDto> getMyComments(Long userId) {
-        List<MyCommentDto> studyDtos = studyCommentRepository.findByUser_Id(userId).stream()
+    public List<MyCommentDto> getMyComments(User user) {
+        List<MyCommentDto> studyDtos = studyCommentRepository.findByUser(user).stream()
                 .map(comment -> MyCommentDto.fromEntity(comment, "study"))
                 .toList();
 
-        List<MyCommentDto> shareDtos = shareCommentRepository.findByUser_Id(userId).stream()
+        List<MyCommentDto> shareDtos = shareCommentRepository.findByUser(user).stream()
                 .map(comment -> MyCommentDto.fromEntity(comment, "share"))
                 .toList();
 
