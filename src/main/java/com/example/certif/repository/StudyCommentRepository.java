@@ -13,10 +13,7 @@ public interface StudyCommentRepository extends JpaRepository<StudyComment, Long
     // postId 기준으로 댓글 시간순 조회
     List<StudyComment> findByPostIdOrderByCreatedAtAsc(Long postId);
 
-    @Query("SELECT c FROM StudyComment c " +
-            "JOIN c.post p " +
-            "JOIN p.category " +
-            "WHERE c.user.id = :userId")
-    List<StudyComment> findByUserIdWithPostAndCategory(@Param("userId") Long userId);
+    @Query("SELECT c FROM StudyComment c WHERE c.user.id = :userId")
+    List<StudyComment> findByUserIdSimple(@Param("userId") Long userId);
 
 }
