@@ -19,6 +19,7 @@ public class MyPostDto {
     private String type; // "study" or "share"
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private Long userId;
 
     // StudyPost 변환
     public static MyPostDto fromEntity(StudyPost post, String type) {
@@ -29,6 +30,7 @@ public class MyPostDto {
                 .type(type)
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
+                .userId(post.getUser().getId())
                 .build();
     }
 
@@ -41,6 +43,7 @@ public class MyPostDto {
                 .type(type)
                 .createdAt(post.getCreatedAt())
                 .updatedAt(post.getUpdatedAt())
+                .userId(post.getUser().getId())
                 .build();
     }
 

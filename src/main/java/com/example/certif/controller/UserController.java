@@ -5,6 +5,7 @@ import com.example.certif.entity.User;
 import com.example.certif.security.UserPrincipal;
 import com.example.certif.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -23,7 +25,7 @@ public class UserController {
     // 마이페이지
     @GetMapping("/my-page")
     public ResponseEntity<User> getMyPage(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(userService.getMyInfo(principal.getUsername()));
+        return ResponseEntity.ok(userService.getMyInfo(principal.getUserId()));
         // getUsername()이 email 반환
     }
 
@@ -47,7 +49,7 @@ public class UserController {
     // 내가 쓴 게시글 목록 조회
     @GetMapping("/my-posts")
     public ResponseEntity<List<MyPostDto>> getMyPosts(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(userService.getMyPosts(principal.getUsername()));
+        return ResponseEntity.ok(userService.getMyPosts(principal.getUserId()));
     }
 
     // 내가 쓴 특정 게시글 조회
@@ -57,20 +59,20 @@ public class UserController {
             @PathVariable Long postId,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        return ResponseEntity.ok(userService.getMyPost(principal.getUsername(), postId, type));
+        return ResponseEntity.ok(userService.getMyPost(principal.getUserId(), postId, type));
     }
 
     // 내가 쓴 게시글 수정
     @PatchMapping("/my-posts/{type}/{postId}")
-    public ResponseEntity<String> updatePost(
+    public ResponseEntity<MyPostDto> updatePost(
             @PathVariable String type,
             @PathVariable Long postId,
             @RequestBody String title,
             @RequestBody String content,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        userService.updatePost(postId, title, content, type, principal.getUsername());
-        return ResponseEntity.ok("게시글 수정 완료");
+        MyPostDto dto = userService.updatePost(postId, title, content, type, principal.getUserId());
+        return ResponseEntity.ok(dto);
     }
 
     // 내가 쓴 게시글 삭제
@@ -80,14 +82,16 @@ public class UserController {
             @PathVariable Long postId,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        userService.deletePost(postId, type, principal.getUsername());
+        userService.deletePost(postId, type, principal.getUserId());
         return ResponseEntity.ok("게시글 삭제 완료");
     }
 
     // 내가 쓴 댓글 목록 조회
     @GetMapping("/my-comments")
     public ResponseEntity<List<MyCommentDto>> getMyComments(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(userService.getMyComments(principal.getUsername())); // username = email
+        Long userId = principal.getUserId();
+        System.out.println("principal userID: " + userId);
+        return ResponseEntity.ok(userService.getMyComments(userId));
     }
 
     // 내가 쓴 특정 댓글 조회
@@ -97,19 +101,19 @@ public class UserController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        return ResponseEntity.ok(userService.getMyComment(principal.getUsername(), commentId, type));
+        return ResponseEntity.ok(userService.getMyComment(principal.getUserId(), commentId, type));
     }
 
     // 내가 쓴 댓글 수정
     @PatchMapping("/my-comments/{type}/{commentId}")
-    public ResponseEntity<String> updateComment(
+    public ResponseEntity<MyCommentDto> updateComment(
             @PathVariable String type,
             @PathVariable Long commentId,
             @RequestBody String content,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        userService.updateComment(commentId, content, type, principal.getUsername());
-        return ResponseEntity.ok("댓글 수정 완료");
+        MyCommentDto dto = userService.updateComment(commentId, content, type, principal.getUserId());
+        return ResponseEntity.ok(dto);
     }
 
     // 내가 쓴 댓글 삭제
@@ -119,7 +123,7 @@ public class UserController {
             @PathVariable Long commentId,
             @AuthenticationPrincipal UserPrincipal principal
     ) throws AccessDeniedException {
-        userService.deleteComment(commentId, type, principal.getUsername());
+        userService.deleteComment(commentId, type, principal.getUserId());
         return ResponseEntity.ok("댓글 삭제 완료");
     }
 

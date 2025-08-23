@@ -51,12 +51,14 @@ public class JwtUtil {
 
     // ✅ 토큰에서 userId 추출: 수정 파트
     public Long getUserIdFromToken(String token) {
-        return Jwts.parserBuilder()
+        Claims claims = Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
                 .parseClaimsJws(token)
-                .getBody()
-                .get("userId", Long.class);
+                .getBody();
+
+        Integer id = claims.get("userId", Integer.class);
+        return id != null ? id.longValue() : null;
     }
 
 

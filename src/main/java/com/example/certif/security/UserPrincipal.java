@@ -3,26 +3,29 @@ package com.example.certif.security;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
+import java.util.Collections;
+
 
 public class UserPrincipal implements UserDetails {
 
-    private final Long userId;
+
+    private final Long id;
     private final String email;
     private final String password;
 
-    public UserPrincipal(Long userId, String email, String password) {
-        this.userId = userId;
+    public UserPrincipal(Long id, String email, String password) {
+        this.id = id;
         this.email = email;
         this.password = password;
     }
 
     public Long getUserId() {
-        return userId;
+        return id;
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null; // 필요 시 ROLE 설정
+        return Collections.emptyList(); // 필요 시 ROLE 설정
     }
 
     @Override
