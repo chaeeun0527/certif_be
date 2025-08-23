@@ -82,12 +82,12 @@ public class UserService {
     @Transactional
     public List<MyPostDto> getMyPosts(Long userId) {
         // 스터디 글
-        List<MyPostDto> studyDtos = studyPostRepository.findByUserId(userId).stream()
+        List<MyPostDto> studyDtos = studyPostRepository.findByUserIdSimple(userId).stream()
                 .map(post -> MyPostDto.fromEntity(post, "study"))
                 .toList();
 
         // 공유 글
-        List<MyPostDto> shareDtos = sharePostRepository.findByUserId(userId).stream()
+        List<MyPostDto> shareDtos = sharePostRepository.findByUserIdSimple(userId).stream()
                 .map(post -> MyPostDto.fromEntity(post, "share"))
                 .toList();
 
@@ -188,9 +188,6 @@ public class UserService {
         List<MyCommentDto> shareDtos = shareCommentRepository.findByUserIdSimple(userId).stream()
                 .map(comment -> MyCommentDto.fromEntity(comment, "share"))
                 .toList();
-
-        System.out.println("studyDtos: "+ studyDtos);
-        System.out.println("shareDtos: "+ shareDtos);
 
         return Stream.concat(studyDtos.stream(), shareDtos.stream())
                 .sorted(Comparator.comparing(MyCommentDto::getCreatedAt).reversed())

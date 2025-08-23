@@ -89,7 +89,6 @@ public class UserController {
     @GetMapping("/my-comments")
     public ResponseEntity<List<MyCommentDto>> getMyComments(@AuthenticationPrincipal UserPrincipal principal) {
         Long userId = principal.getUserId();
-        System.out.println("principal userID: " + userId);
         return ResponseEntity.ok(userService.getMyComments(userId));
     }
 
