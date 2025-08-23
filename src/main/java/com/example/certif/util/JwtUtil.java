@@ -57,8 +57,8 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
 
-        Integer id = claims.get("userId", Integer.class);
-        return id != null ? id.longValue() : null;
+        // 바로 Long으로 꺼내기
+        return claims.get("userId", Long.class);
     }
 
 

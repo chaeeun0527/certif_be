@@ -26,7 +26,6 @@ public class UserController {
     @GetMapping("/my-page")
     public ResponseEntity<User> getMyPage(@AuthenticationPrincipal UserPrincipal principal) {
         return ResponseEntity.ok(userService.getMyInfo(principal.getUserId()));
-        // getUsername()이 email 반환
     }
 
     // 비밀번호 재설정 요청 메일 보내기

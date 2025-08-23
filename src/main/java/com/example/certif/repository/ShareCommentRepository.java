@@ -15,11 +15,11 @@ public interface ShareCommentRepository extends JpaRepository<ShareComment, Long
     //게시물 ID로 댓글 목록 조회
     List<ShareComment> findBySharePostId(Long postId);
 
-    @Query("SELECT shc FROM ShareComment shc " +
-            "JOIN shc.user u " +
-            "JOIN FETCH shc.sharePost sp " +
-            "JOIN FETCH sp.category c " +
-            "WHERE u.id = :userId")
+    @Query("SELECT c FROM ShareComment c " +
+            "JOIN FETCH c.sharePost p " +
+            "JOIN FETCH p.category " +
+            "JOIN FETCH c.user " +
+            "WHERE c.user.id = :userId")
     List<ShareComment> findByUserIdWithPostAndCategory(@Param("userId") Long userId);
 
 }
