@@ -3,6 +3,8 @@ package com.example.certif.repository;
 import com.example.certif.entity.ShareComment;
 import com.example.certif.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,6 +15,11 @@ public interface ShareCommentRepository extends JpaRepository<ShareComment, Long
     //게시물 ID로 댓글 목록 조회
     List<ShareComment> findBySharePostId(Long postId);
 
-    // useId 기준으로 엔티티 조회
-    List<ShareComment> findByUser(User user);
+    @Query("SELECT shc FROM ShareComment shc " +
+            "JOIN shc.user u " +
+            "JOIN FETCH shc.sharePost sp " +
+            "JOIN FETCH sp.category c " +
+            "WHERE u.id = :userId")
+    List<ShareComment> findByUserIdWithPostAndCategory(@Param("userId") Long userId);
+
 }
