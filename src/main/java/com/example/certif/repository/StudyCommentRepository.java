@@ -11,5 +11,5 @@ public interface StudyCommentRepository extends JpaRepository<StudyComment, Long
     List<StudyComment> findByPostIdOrderByCreatedAtAsc(Long postId);
 
     // userId 기준으로 엔티티 조회
-    List<StudyComment> findByUserId(Long userId);
+    List<StudyComment> findByUser_Id(Long userId);
 }

@@ -77,6 +77,7 @@ public class UserService {
     }
 
     // 내가 쓴 게시글 목록 조회
+    @Transactional
     public List<MyPostDto> getMyPosts(Long userId) {
         // 스터디 글
         List<MyPostDto> studyDtos = studyPostRepository.findByUserId(userId).stream()
@@ -104,6 +105,7 @@ public class UserService {
     }
 
     // 내가 쓴 특정 게시글 조회
+    @Transactional
     public MyPostDto getMyPost(Long userId, Long postId, String type) throws AccessDeniedException {
         if ("study".equals(type)) {
             StudyPost post = studyPostRepository.findById(postId)
@@ -172,13 +174,16 @@ public class UserService {
         }
     }
 
+
+    // 댓글 관련 서비스
     // 내가 쓴 댓글 목록 조회
+    @Transactional
     public List<MyCommentDto> getMyComments(Long userId) {
-        List<MyCommentDto> studyDtos = studyCommentRepository.findByUserId(userId).stream()
+        List<MyCommentDto> studyDtos = studyCommentRepository.findByUser_Id(userId).stream()
                 .map(comment -> MyCommentDto.fromEntity(comment, "study"))
                 .toList();
 
-        List<MyCommentDto> shareDtos = shareCommentRepository.findByUserId(userId).stream()
+        List<MyCommentDto> shareDtos = shareCommentRepository.findByUser_Id(userId).stream()
                 .map(comment -> MyCommentDto.fromEntity(comment, "share"))
                 .toList();
 
@@ -191,6 +196,7 @@ public class UserService {
 
 
     // 내가 쓴 특정 댓글 조회
+    @Transactional
     public MyCommentDto getMyComment(Long userId, Long commentId, String type) throws AccessDeniedException {
         if ("study".equals(type)) {
             StudyComment comment = studyCommentRepository.findById(commentId)
