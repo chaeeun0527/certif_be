@@ -14,9 +14,8 @@ public interface StudyCommentRepository extends JpaRepository<StudyComment, Long
     List<StudyComment> findByPostIdOrderByCreatedAtAsc(Long postId);
 
     @Query("SELECT c FROM StudyComment c " +
-            "JOIN FETCH c.post p " +
-            "JOIN FETCH p.category " +
-            "JOIN FETCH c.user " +
+            "JOIN c.post p " +
+            "JOIN p.category " +
             "WHERE c.user.id = :userId")
     List<StudyComment> findByUserIdWithPostAndCategory(@Param("userId") Long userId);
 

@@ -16,9 +16,8 @@ public interface ShareCommentRepository extends JpaRepository<ShareComment, Long
     List<ShareComment> findBySharePostId(Long postId);
 
     @Query("SELECT c FROM ShareComment c " +
-            "JOIN FETCH c.sharePost p " +
-            "JOIN FETCH p.category " +
-            "JOIN FETCH c.user " +
+            "JOIN c.sharePost p " +
+            "JOIN p.category " +
             "WHERE c.user.id = :userId")
     List<ShareComment> findByUserIdWithPostAndCategory(@Param("userId") Long userId);
 
