@@ -44,7 +44,7 @@ public class StudyPostController {
         StudyPostResponseDto dto = studyPostService.findById(postId);
         return ResponseEntity.status(HttpStatus.OK).body(dto);
     }
-
+/*
     //  2. 스터디 게시판 글 생성
 <<<<<<< HEAD
     @PostMapping("/api/study")
@@ -103,4 +103,6 @@ public class StudyPostController {
         studyPostService.delete(postId, userId); // 작성자 확인 포함
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+ */
 }

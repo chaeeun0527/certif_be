@@ -16,8 +16,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -187,11 +189,12 @@ public class UserService {
                 .map(comment -> MyCommentDto.fromEntity(comment, "share"))
                 .toList();
 
-        List<MyCommentDto> result = new ArrayList<>();
-        result.addAll(studyDtos);
-        result.addAll(shareDtos);
+        System.out.println("studyDtos: "+ studyDtos);
+        System.out.println("shareDtos: "+ shareDtos);
 
-        return result;
+        return Stream.concat(studyDtos.stream(), shareDtos.stream())
+                .sorted(Comparator.comparing(MyCommentDto::getCreatedAt).reversed())
+                .toList();
     }
 
 

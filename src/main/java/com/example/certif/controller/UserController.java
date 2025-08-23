@@ -5,6 +5,7 @@ import com.example.certif.entity.User;
 import com.example.certif.security.UserPrincipal;
 import com.example.certif.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -13,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.nio.file.AccessDeniedException;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user")
@@ -87,7 +89,9 @@ public class UserController {
     // 내가 쓴 댓글 목록 조회
     @GetMapping("/my-comments")
     public ResponseEntity<List<MyCommentDto>> getMyComments(@AuthenticationPrincipal UserPrincipal principal) {
-        return ResponseEntity.ok(userService.getMyComments(principal.getUserId()));
+        Long userId = principal.getUserId();
+        System.out.println("principal userID: " + userId);
+        return ResponseEntity.ok(userService.getMyComments(userId));
     }
 
     // 내가 쓴 특정 댓글 조회
