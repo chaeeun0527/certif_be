@@ -12,5 +12,8 @@ public interface FavoriteRepository extends JpaRepository<Favorite, FavoriteId> 
 
     // 특정 사용자, 해당 자격증을 즐겨찾기 했는지 확인
     boolean existsByUserIdAndCertificateId(Long userId, Long certificateId);
+
+    // 즐겨찾기 해제
+    void deleteByUserIdAndCertificateId(Long userId, Long certificateId);
 }
 

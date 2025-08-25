@@ -54,7 +54,7 @@ public class FavoriteService {
 
     // 3. 자격증을 즐겨찾기에서 해제
     public void removeFavorite(Long userId, Long certificateId) {
-        favoriteRepository.deleteById(new FavoriteId(userId, certificateId));
+        favoriteRepository.deleteByUserIdAndCertificateId(userId, certificateId);
     }
 }
 
