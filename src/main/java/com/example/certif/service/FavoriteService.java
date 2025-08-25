@@ -58,9 +58,16 @@ public class FavoriteService {
     // 3. 자격증을 즐겨찾기에서 해제
     @Transactional
     public void removeFavorite(Long userId, Long certificateId) {
+// 삭제 전 존재 여부 확인
+        boolean exists = favoriteRepository.existsByUserIdAndCertificateId(userId, certificateId);
+        if (!exists) {
+            throw new RuntimeException("삭제 대상 즐겨찾기가 존재하지 않습니다.");
+        }
 
-        favoriteRepository.deleteByCertificateIdAndUserId(certificateId, userId);
-    }
+        // 삭제 + 즉시 flush
+        favoriteRepository.deleteByUserIdAndCertificateId(userId, certificateId);
+        favoriteRepository.flush(); // 트랜잭션 내 즉시 DB 반영
+        }
 }
 
 
