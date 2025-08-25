@@ -14,6 +14,6 @@ public interface FavoriteRepository extends JpaRepository<Favorite, FavoriteId> 
     boolean existsByUserIdAndCertificateId(Long userId, Long certificateId);
 
     // 즐겨찾기 해제
-    void deleteByUserIdAndCertificateId(Long userId, Long certificateId);
+    void deleteByCertificateIdAndUserId(Long certificateId, Long userId);
 }
 

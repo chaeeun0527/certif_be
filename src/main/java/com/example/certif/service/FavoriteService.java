@@ -8,6 +8,7 @@ import com.example.certif.entity.id.FavoriteId;
 import com.example.certif.repository.CertificateRepository;
 import com.example.certif.repository.FavoriteRepository;
 import com.example.certif.repository.UserRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +24,7 @@ public class FavoriteService {
     private final UserRepository userRepository;
 
     // 1. 사용자의 즐겨찾기 자격증 목록 조회
+    @Transactional
     public List<FavoriteCertificateDto> getFavoritesByUser(Long userId) {
         List<Favorite> favorites = favoriteRepository.findByUserId(userId);
         return favorites.stream()
@@ -36,6 +38,7 @@ public class FavoriteService {
     }
 
     // 2. 자격증을 즐겨찾기에 등록
+    @Transactional
     public void addFavorite(Long userId, Long certificateId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
@@ -53,8 +56,10 @@ public class FavoriteService {
     }
 
     // 3. 자격증을 즐겨찾기에서 해제
+    @Transactional
     public void removeFavorite(Long userId, Long certificateId) {
-        favoriteRepository.deleteByUserIdAndCertificateId(userId, certificateId);
+
+        favoriteRepository.deleteByCertificateIdAndUserId(certificateId, userId);
     }
 }
 
