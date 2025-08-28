@@ -9,4 +9,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     boolean existsByNickname(String nickname);
     Optional<User> findByEmail(String email);
+
+    // 비밀번호 재설정 토큰으로 사용자 조회
+    Optional<User> findByPasswordResetToken(String token);
 }
