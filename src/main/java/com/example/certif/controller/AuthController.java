@@ -49,22 +49,44 @@ public class AuthController {
         return ResponseEntity.ok(newToken);
     }
 
-    // ✅ 이름 명시 + 서비스에서 정규화 처리
     @GetMapping("/check-email")
-    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam("email") String email) {
+    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
         boolean isDuplicate = authService.checkEmail(email);
         return ResponseEntity.ok(Map.of("isDuplicate", isDuplicate));
     }
 
     @GetMapping("/check-nickname")
-    public ResponseEntity<Map<String, Boolean>> checkNickname(@RequestParam("nickname") String nickname) {
+    public ResponseEntity<Map<String, Boolean>> checkNickname(@RequestParam String nickname) {
         boolean isDuplicate = authService.checkNickname(nickname);
         return ResponseEntity.ok(Map.of("isDuplicate", isDuplicate));
     }
 
     @DeleteMapping("/delete-account")
-    public ResponseEntity<String> deleteAccount(@RequestParam("email") String email) {
+    public ResponseEntity<String> deleteAccount(@RequestParam String email) {
         authService.deleteAccount(email);
         return ResponseEntity.ok("회원 탈퇴 완료");
+    }
+
+    // ===== 비밀번호 재설정 2개 엔드포인트 =====
+
+    @PostMapping("/password-reset/request")
+    public ResponseEntity<String> requestPasswordReset(@RequestBody Map<String, String> body) {
+        String email = body.get("email");
+        if (email == null || email.isBlank()) {
+            return ResponseEntity.badRequest().body("email is required");
+        }
+        authService.sendPasswordResetToken(email);
+        return ResponseEntity.ok("Password reset token issued (check server logs).");
+    }
+
+    @PostMapping("/password-reset/confirm")
+    public ResponseEntity<String> confirmPasswordReset(@RequestBody Map<String, String> body) {
+        String token = body.get("token");
+        String newPassword = body.get("newPassword");
+        if (token == null || token.isBlank() || newPassword == null || newPassword.isBlank()) {
+            return ResponseEntity.badRequest().body("token and newPassword are required");
+        }
+        authService.resetPassword(token, newPassword);
+        return ResponseEntity.ok("Password changed.");
     }
 }
