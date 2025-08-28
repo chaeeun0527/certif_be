@@ -35,18 +35,20 @@ public class User {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
+    //생성 시 자동 시간 설정
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
         this.updatedAt = LocalDateTime.now();
     }
 
+    // 수정 시 자동 시간 갱신
     @PreUpdate
     protected void onUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
 
-    // 👉 명시적 getter (JwtUtil, AuthService 등에서 사용됨)
+    // jwtUtil 등에서 사용되는 명시적 getter (가독성 + 안정성 ↑)
     public String getEmail() {
         return this.email;
     }
@@ -61,5 +63,30 @@ public class User {
 
     public Long getId() {
         return this.id;
+    }
+
+    public void setProfileImageUrl(String url) {
+        this.profileImage = url;
+    }
+
+    public String getProfileImageUrl() {
+        return this.profileImage;
+    }
+
+    // 비밀번호 재설정 토큰 관련
+    public void setPasswordResetToken(String token) {
+        this.passwordResetToken = token;
+    }
+
+    public String getPasswordResetToken() {
+        return this.passwordResetToken;
+    }
+
+    public void setPasswordResetExpiry(LocalDateTime expiry) {
+        this.passwordResetExpiry = expiry;
+    }
+
+    public LocalDateTime getPasswordResetExpiry() {
+        return this.passwordResetExpiry;
     }
 }
