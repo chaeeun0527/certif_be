@@ -23,7 +23,6 @@ public class AuthService {
 
     private final Set<String> blacklist = new HashSet<>();
 
-    // 회원가입
     public User signup(SignupRequest request) {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("이미 존재하는 이메일입니다.");
@@ -41,41 +40,34 @@ public class AuthService {
         return userRepository.save(user);
     }
 
-    // 로그인
     public User login(LoginRequest request) {
         return userRepository.findByEmail(request.getEmail())
                 .filter(user -> passwordEncoder.matches(request.getPassword(), user.getPassword()))
                 .orElseThrow(() -> new RuntimeException("이메일 또는 비밀번호가 올바르지 않습니다."));
     }
 
-    // 이메일 중복 확인
     public boolean checkEmail(String email) {
         return userRepository.existsByEmail(email);
     }
 
-    // 닉네임 중복 확인
     public boolean checkNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
     }
 
-    // 회원 탈퇴
     public void deleteAccount(String email) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
         userRepository.delete(user);
     }
 
-    // 로그아웃
     public void logout(String token) {
         blacklist.add(token);
     }
-
 
     public boolean isTokenBlacklisted(String token) {
         return blacklist.contains(token);
     }
 
-    //  토큰 갱신
     public String refreshToken(String oldToken) {
         if (!jwtUtil.validateToken(oldToken) || isTokenBlacklisted(oldToken)) {
             throw new RuntimeException("유효하지 않은 토큰입니다.");

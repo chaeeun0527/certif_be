@@ -21,27 +21,20 @@ public class AuthController {
     private final AuthService authService;
     private final JwtUtil jwtUtil;
 
-    // 회원가입
     @PostMapping("/signup")
     public ResponseEntity<User> signup(@RequestBody SignupRequest request) {
         User user = authService.signup(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
-    // 로그인
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest request) {
         User user = authService.login(request);
         String accessToken = jwtUtil.generateAccessToken(user);
         String refreshToken = jwtUtil.generateRefreshToken(user);
-
-        return ResponseEntity.ok(Map.of(
-                "accessToken", accessToken,
-                "refreshToken", refreshToken
-        ));
+        return ResponseEntity.ok(Map.of("accessToken", accessToken, "refreshToken", refreshToken));
     }
 
-    // 로그아웃 (토큰 블랙리스트 처리)
     @PostMapping("/logout")
     public ResponseEntity<String> logout(@RequestHeader("Authorization") String token) {
         String pureToken = token.replace("Bearer ", "");
@@ -49,7 +42,6 @@ public class AuthController {
         return ResponseEntity.ok("로그아웃 성공");
     }
 
-    // 토큰 갱신
     @PostMapping("/refresh-token")
     public ResponseEntity<String> refreshToken(@RequestHeader("Authorization") String token) {
         String pureToken = token.replace("Bearer ", "");
@@ -57,23 +49,21 @@ public class AuthController {
         return ResponseEntity.ok(newToken);
     }
 
-    // 이메일 중복 확인
+    // ✅ 이름 명시 + 서비스에서 정규화 처리
     @GetMapping("/check-email")
-    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam String email) {
+    public ResponseEntity<Map<String, Boolean>> checkEmail(@RequestParam("email") String email) {
         boolean isDuplicate = authService.checkEmail(email);
         return ResponseEntity.ok(Map.of("isDuplicate", isDuplicate));
     }
 
-    // 닉네임 중복 확인
     @GetMapping("/check-nickname")
-    public ResponseEntity<Map<String, Boolean>> checkNickname(@RequestParam String nickname) {
+    public ResponseEntity<Map<String, Boolean>> checkNickname(@RequestParam("nickname") String nickname) {
         boolean isDuplicate = authService.checkNickname(nickname);
         return ResponseEntity.ok(Map.of("isDuplicate", isDuplicate));
     }
 
-    // 회원 탈퇴
     @DeleteMapping("/delete-account")
-    public ResponseEntity<String> deleteAccount(@RequestParam String email) {
+    public ResponseEntity<String> deleteAccount(@RequestParam("email") String email) {
         authService.deleteAccount(email);
         return ResponseEntity.ok("회원 탈퇴 완료");
     }
