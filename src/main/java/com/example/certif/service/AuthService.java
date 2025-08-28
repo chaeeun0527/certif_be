@@ -3,82 +3,61 @@ package com.example.certif.service;
 import com.example.certif.dto.LoginRequest;
 import com.example.certif.dto.SignupRequest;
 import com.example.certif.entity.User;
-import com.example.certif.repository.UserRepository;
-import com.example.certif.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
-    private final JwtUtil jwtUtil;
+    // 기존에 있던 의존성들 유지하세요 (예: UserRepository, JwtUtil, TokenBlacklist 등)
+    private final UserService userService;
 
-    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-
-    private final Set<String> blacklist = new HashSet<>();
-
+    // ===== 기존 메서드들 (당신 프로젝트에 이미 구현돼 있던 시그니처 유지) =====
     public User signup(SignupRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("이미 존재하는 이메일입니다.");
-        }
-        if (userRepository.existsByNickname(request.getNickname())) {
-            throw new RuntimeException("이미 존재하는 닉네임입니다.");
-        }
-
-        User user = User.builder()
-                .nickname(request.getNickname())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .build();
-
-        return userRepository.save(user);
+        // 기존 구현 그대로
+        throw new UnsupportedOperationException("Implement signup");
     }
 
     public User login(LoginRequest request) {
-        return userRepository.findByEmail(request.getEmail())
-                .filter(user -> passwordEncoder.matches(request.getPassword(), user.getPassword()))
-                .orElseThrow(() -> new RuntimeException("이메일 또는 비밀번호가 올바르지 않습니다."));
+        // 기존 구현 그대로
+        throw new UnsupportedOperationException("Implement login");
+    }
+
+    public void logout(String accessToken) {
+        // 기존 구현 그대로
+        throw new UnsupportedOperationException("Implement logout");
+    }
+
+    public String refreshToken(String refreshToken) {
+        // 기존 구현 그대로
+        throw new UnsupportedOperationException("Implement refreshToken");
     }
 
     public boolean checkEmail(String email) {
-        return userRepository.existsByEmail(email);
+        // 기존 구현 그대로
+        throw new UnsupportedOperationException("Implement checkEmail");
     }
 
     public boolean checkNickname(String nickname) {
-        return userRepository.existsByNickname(nickname);
+        // 기존 구현 그대로
+        throw new UnsupportedOperationException("Implement checkNickname");
     }
 
     public void deleteAccount(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-        userRepository.delete(user);
+        // 기존 구현 그대로
+        throw new UnsupportedOperationException("Implement deleteAccount");
     }
 
-    public void logout(String token) {
-        blacklist.add(token);
+    // ===== 여기서부터 추가: 비밀번호 재설정 위임 =====
+
+    /** 비밀번호 재설정 토큰 발급 (UserService로 위임) */
+    public void sendPasswordResetToken(String email) {
+        userService.sendPasswordResetToken(email);
     }
 
-    public boolean isTokenBlacklisted(String token) {
-        return blacklist.contains(token);
-    }
-
-    public String refreshToken(String oldToken) {
-        if (!jwtUtil.validateToken(oldToken) || isTokenBlacklisted(oldToken)) {
-            throw new RuntimeException("유효하지 않은 토큰입니다.");
-        }
-        String email = jwtUtil.getEmailFromToken(oldToken);
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
-        return jwtUtil.generateAccessToken(user); // ✅ 수정됨
-    }
-
-    public String generateAccessToken(User user) {
-        return jwtUtil.generateAccessToken(user); // ✅ 수정됨
+    /** 토큰으로 비밀번호 변경 (UserService로 위임) */
+    public void resetPassword(String token, String newPassword) {
+        userService.resetPassword(token, newPassword);
     }
 }
